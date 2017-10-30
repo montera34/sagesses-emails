@@ -9,8 +9,22 @@ License: GPLv3
 */
 
 // VARIABLES
-$subjects_count = 10;
-$addresses_count = 20;
+$subjects_count = 10; // Maximum number of subjects for the emails to choose from
+$addresses_count = 20; // Maximum number of email addresses to send emails to
+$content_cpt = 'email';
+
+// ADD IMAGE SIZE FOR EMAIL CONTENT
+add_action( 'init', 'sgs_emails_image_size' );
+function sgs_emails_image_size() {
+	add_image_size( 'sgs-emails', 500, 0, false );
+	add_filter( 'image_size_names_choose', 'sgs_emails_image_size_names' );
+}
+function sgs_emails_image_size_names( $sizes ) {
+	return array_merge( $sizes, array(
+		'sgs-emails' => __('Sagesses Email plugin size','sgs_emails')
+	) );
+}
+
 
 // ADD PLUGIN OPTION PAGE TO DASHBOARD
 add_action('admin_menu', 'sgs_emails_dashboard_page');
