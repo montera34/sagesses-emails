@@ -46,13 +46,20 @@ function sgs_emails_register_settings() {
 	add_settings_section( 'sgs_emails_settings_ptype_section', __('Post type','sgs_emails'), 'sgs_emails_settings_ptype_section_callback', 'sagesses_emails' );
 	add_settings_field( 'sgs_emails_settings_ptype', __('Post type for email content','sgs_emails'), 'sgs_emails_settings_ptype_callback', 'sagesses_emails', 'sgs_emails_settings_ptype_section' );
 
-	// subjects list setting
+	// subjects list settings
 	add_settings_section( 'sgs_emails_settings_subjects_section', __('Subjects','sgs_emails'), 'sgs_emails_settings_subjects_section_callback', 'sagesses_emails' );
 	add_settings_field( 'sgs_emails_settings_subjects', __('List of subjects','sgs_emails'), 'sgs_emails_settings_subjects_callback', 'sagesses_emails', 'sgs_emails_settings_subjects_section' );
 
-	// email addresses list setting
+	// email addresses list settings
 	add_settings_section( 'sgs_emails_settings_addresses_section', __('Addresses','sgs_emails'), 'sgs_emails_settings_addresses_section_callback', 'sagesses_emails' );
 	add_settings_field( 'sgs_emails_settings_addresses', __('List of addresses','sgs_emails'), 'sgs_emails_settings_addresses_callback', 'sagesses_emails', 'sgs_emails_settings_addresses_section' );
+
+	// email from and reply-to settings
+	add_settings_section( 'sgs_emails_settings_headers_section', __('Email headers','sgs_emails'), 'sgs_emails_settings_headers_section_callback', 'sagesses_emails' );
+	add_settings_field( 'sgs_emails_settings_from', __('From field (email address)','sgs_emails'), 'sgs_emails_settings_headers_from_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
+	add_settings_field( 'sgs_emails_settings_from_name', __('From field (name)','sgs_emails'), 'sgs_emails_settings_headers_from_name_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
+	add_settings_field( 'sgs_emails_settings_replyto', __('Reply-to field (email address)','sgs_emails'), 'sgs_emails_settings_headers_replyto_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
+	add_settings_field( 'sgs_emails_settings_replyto_name', __('Reply-to field (name)','sgs_emails'), 'sgs_emails_settings_headers_replyto_name_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
 
 }
 
@@ -111,6 +118,34 @@ function sgs_emails_settings_addresses_callback() {
 
 }
 
+// email from and reply-to headers
+function sgs_emails_settings_headers_section_callback() {
+	echo __('Headers for outgoing emails sent by this plugin.','sgs_emails');
+}
+
+function sgs_emails_settings_headers_from_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$value = esc_attr( $settings['sgs_emails_settings_from'] );
+	echo "<input type='text' name='sgs_emails_settings[sgs_emails_settings_from]' value='$value' />";
+}
+
+function sgs_emails_settings_headers_from_name_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$value = esc_attr( $settings['sgs_emails_settings_from_name'] );
+	echo "<input type='text' name='sgs_emails_settings[sgs_emails_settings_from_name]' value='$value' />";
+}
+
+function sgs_emails_settings_headers_replyto_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$value = esc_attr( $settings['sgs_emails_settings_replyto'] );
+	echo "<input type='text' name='sgs_emails_settings[sgs_emails_settings_replyto]' value='$value' />";
+}
+
+function sgs_emails_settings_headers_replyto_name_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$value = esc_attr( $settings['sgs_emails_settings_replyto_name'] );
+	echo "<input type='text' name='sgs_emails_settings[sgs_emails_settings_replyto_name]' value='$value' />";
+}
 
 // GENERATE OUTPUT
 function sgs_emails_dashboard_page_output() { ?>
@@ -181,14 +216,16 @@ function sgs_emails_choose_image() {
 
 // COMPOSE AND SEND EMAIL
 function sgs_emails_compose_and_send($email_address) {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$replyto = $settings['sgs_emails_settings_replyto'];
+	$replyto_name = $settings['sgs_emails_settings_replyto_name'];
 
 	$to = $email_address;
 	$subject = sgs_emails_choose_subject();
 
 	add_filter( 'wp_mail_from', 'sgs_mail_from' );
 	add_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
-	$headers[] = 'From: Sagesses <noreply@sagesses.biz>' . "\r\n";
-	$headers[] = 'Reply-To: Sagesses <sagessesinfos@gmail.com>' . "\r\n";
+	$headers[] = 'Reply-To: '.$replyto_name.' <'.$replyto.'>' . "\r\n";
 	$headers[] = 'To: <' .$to. '>' . "\r\n";
 	// To send HTML mail, the Content-type header must be set
 	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
@@ -205,12 +242,16 @@ function sgs_emails_compose_and_send($email_address) {
 
 // SET CUSTOM MAIL FROM
 function sgs_mail_from( $original_email_address ) {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$from = $settings['sgs_emails_settings_from'];
 	//Make sure the email is from the same domain 
 	//as your website to avoid being marked as spam.
-	return 'noreply@sagesses.biz';
+	return $from;
 }
 function sgs_mail_from_name( $original_email_from ) {
-	return 'Sagesses';
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$from = $settings['sgs_emails_settings_from_name'];
+	return $from_name;
 }
 
 ?>
