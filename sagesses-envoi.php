@@ -175,7 +175,7 @@ function sgs_emails_choose_subject() {
 }
 
 // CHOOSE CONTENT FOR EMAIL
-function sgs_emails_choose_image() {
+function sgs_emails_choose_image($email_address) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$pt = $settings['sgs_emails_settings_ptype'];
 
@@ -230,7 +230,7 @@ function sgs_emails_compose_and_send($email_address) {
 	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
 	$headers[] = 'Content-type: text/html; charset=UTF-8' . "\r\n";
 
-	$image = sgs_emails_choose_image();
+	$image = sgs_emails_choose_image($to);
 	include "email-template.php";
 	$message = $email_template;
 	$sent = wp_mail( $to, $subject, $message, $headers);
@@ -273,4 +273,47 @@ function sgs_emails_action_per_address() {
 	}
 }
 
+
+////
+// CRON TASKS
+register_activation_hook( __FILE__, 'sgs_emails_set_wpcron' );
+function sgs_emails_set_wpcron() {
+
+	$time1 = strtotime('tomorrow 1:00');
+	$time2 = strtotime('tomorrow 3:00');
+	$time3 = strtotime('tomorrow 7:00');
+	$time4 = strtotime('tomorrow 9:00');
+	$time5 = strtotime('tomorrow 10:00');
+
+	// Use wp_next_scheduled to check if the event is already scheduled
+	$timestamp1 = wp_next_scheduled( 'sgs_emails_set_cron_1' );
+	$timestamp2 = wp_next_scheduled( 'sgs_emails_set_cron_2' );
+	$timestamp3 = wp_next_scheduled( 'sgs_emails_set_cron_3' );
+	$timestamp4 = wp_next_scheduled( 'sgs_emails_set_cron_4' );
+	$timestamp5 = wp_next_scheduled( 'sgs_emails_set_cron_5' );
+
+	// If $timestamp == false schedule daily backups since it hasn't been done previously
+	// Schedule the event for right now, then to repeat daily using the hook 'sgs_emails_create_cron_send'
+	if( $timestamp1 == false )
+		wp_schedule_event( $time1, 'daily', 'sgs_emails_set_cron_1' );
+	if( $timestamp2 == false )
+		wp_schedule_event( $time2, 'daily', 'sgs_emails_set_cron_2' );
+	if( $timestamp3 == false )
+		wp_schedule_event( $time3, 'daily', 'sgs_emails_set_cron_3' );
+	if( $timestamp4 == false )
+		wp_schedule_event( $time4, 'daily', 'sgs_emails_set_cron_4' );
+	if( $timestamp5 == false )
+		wp_schedule_event( $time5, 'daily', 'sgs_emails_set_cron_5' );
+
+}
+
+//Hook our function, sgs_emails_action_per_address, into the action sgs_emails_scheduled_send
+add_action( 'sgs_emails_set_cron_1', 'sgs_emails_action_per_address');
+add_action( 'sgs_emails_set_cron_2', 'sgs_emails_action_per_address');
+add_action( 'sgs_emails_set_cron_3', 'sgs_emails_action_per_address');
+add_action( 'sgs_emails_set_cron_4', 'sgs_emails_action_per_address');
+add_action( 'sgs_emails_set_cron_5', 'sgs_emails_action_per_address');
+
+// end CRON TASKS
+////
 ?>
