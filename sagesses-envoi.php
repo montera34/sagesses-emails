@@ -15,7 +15,7 @@ $addresses_count = 20; // Maximum number of email addresses to send emails to
 // ADD IMAGE SIZE FOR EMAIL CONTENT
 add_action( 'init', 'sgs_emails_image_size' );
 function sgs_emails_image_size() {
-	add_image_size( 'sgs-emails', 500, 0, false );
+	add_image_size( 'sgs-emails', 500, 500, false );
 	add_filter( 'image_size_names_choose', 'sgs_emails_image_size_names' );
 }
 function sgs_emails_image_size_names( $sizes ) {
@@ -25,14 +25,15 @@ function sgs_emails_image_size_names( $sizes ) {
 }
 
 
+////
+// PLUGIN PAGE IN DASHBOARD
+
 // ADD PLUGIN OPTION PAGE TO DASHBOARD
 add_action('admin_menu', 'sgs_emails_dashboard_page');
 function sgs_emails_dashboard_page() {
 	add_menu_page(__('Sagesses emails','sgs_emails'),'Sagesses emails ','moderate_comments','sagesses_emails', 'sgs_emails_dashboard_page_output','dashicons-email-alt',80);
-
-	//add_submenu_page('options-general.php',__('','sgs'),'Notification email','manage_options','notifica_email', 'm34_notifica_options_page');
-	//add_options_page( 'Notification email','Notification email','manage_options','notifica_email', 'm34_notifica_options_page' );
 }
+
 
 // REGISTER PLUGIN SETTINGS
 // using Settings API
@@ -55,8 +56,8 @@ function sgs_emails_register_settings() {
 
 }
 
-// CALLBACK FUNCTIONS
 
+// CALLBACK FUNCTIONS
 // post type
 function sgs_emails_settings_ptype_section_callback() {
 	echo __('Choose a post type to feed the emails with content.','sgs_emails');
@@ -110,6 +111,7 @@ function sgs_emails_settings_addresses_callback() {
 
 }
 
+
 // GENERATE OUTPUT
 function sgs_emails_dashboard_page_output() { ?>
 	<div class="wrap">
@@ -123,5 +125,40 @@ function sgs_emails_dashboard_page_output() { ?>
 <?php
 }
 
+// end PLUGIN PAGE IN DASHBOARD
+////
 
+
+// CHOOSE SUBJECT FOR EMAIL
+function sgs_emails_choose_subject() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$subjects = $settings['sgs_emails_settings_subjects'];
+	$subject = '';
+	while ( $subject == '' ) {
+		$subject = $subjects[array_rand($subjects)];
+	}
+	return $subject;
+}
+
+// CHOOSE CONTENT FOR EMAIL
+function sgs_emails_choose_content() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$pt = $settings['sgs_emails_settings_ptype'];
+
+	$args = array(
+		'post_type' => $pt,
+		'showposts' => 1,
+		'orderby' => 'rand'
+	);
+	$image = '';
+	while ( $image == '' ) {
+		$contents = get_posts($args);
+		$content = $contents[0];
+		if ( has_post_thumbnail($content->ID) ) {
+			$image = get_the_post_thumbnail($content->ID,'sgs-emails');
+		}
+	}
+	
+	return $image;
+}
 ?>
