@@ -115,7 +115,6 @@ function sgs_emails_settings_addresses_callback() {
 		echo "<input type='text' name='sgs_emails_settings[sgs_emails_settings_addresses][".$count."]' value='$address' />";
 		$count++;
 	}
-
 }
 
 // email from and reply-to headers
@@ -240,6 +239,13 @@ function sgs_emails_compose_and_send($email_address) {
 	return $sent;
 }
 
+// DETERMINE WHEN TO SEND EMAIL
+function sgs_emails_if_send() {
+	$numbers = array(0,0,1);
+	$send = $numbers[array_rand($numbers)];
+	return $send;
+}
+
 // SET CUSTOM MAIL FROM
 function sgs_mail_from( $original_email_address ) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
@@ -248,10 +254,23 @@ function sgs_mail_from( $original_email_address ) {
 	//as your website to avoid being marked as spam.
 	return $from;
 }
+
 function sgs_mail_from_name( $original_email_from ) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
-	$from = $settings['sgs_emails_settings_from_name'];
+	$from_name = $settings['sgs_emails_settings_from_name'];
 	return $from_name;
+}
+
+// ACTION PER ADDRESS
+function sgs_emails_action_per_address() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$addresses = $settings['sgs_emails_settings_addresses'];
+	foreach ( $addresses as $a ) {
+		if ( sgs_emails_if_send() !== 1 )
+			continue;
+
+		$sent = sgs_emails_compose_and_send($a);
+	}
 }
 
 ?>
