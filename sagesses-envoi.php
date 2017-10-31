@@ -141,7 +141,7 @@ function sgs_emails_choose_subject() {
 }
 
 // CHOOSE CONTENT FOR EMAIL
-function sgs_emails_choose_content() {
+function sgs_emails_choose_image() {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$pt = $settings['sgs_emails_settings_ptype'];
 
@@ -150,15 +150,67 @@ function sgs_emails_choose_content() {
 		'showposts' => 1,
 		'orderby' => 'rand'
 	);
-	$image = '';
-	while ( $image == '' ) {
+	$image_id = '';
+	while ( $image_id == '' ) {
 		$contents = get_posts($args);
 		$content = $contents[0];
 		if ( has_post_thumbnail($content->ID) ) {
-			$image = get_the_post_thumbnail($content->ID,'sgs-emails');
+			$upload_dir = wp_get_upload_dir();
+			$image_dir = trailingslashit($upload_dir['baseurl']);
+			$image['id'] = get_post_thumbnail_id($content->ID);
+			$image['alt'] = $content->post_title;
+			$image_data = wp_get_attachment_metadata($image['id']);
+			$image_subdir = ( preg_match('/\d{4}\/\d{2}/',$image_data['file'],$matches ) == 1 ) ? trailingslashit($matches[0]) : '';
+			$image_email = $image_data['sizes']['sgs_emails'];
+			if ( is_array($image_email) && count($image_email) == 4 ) {
+				$image['url'] =  $image_dir . $image_subdir . $image_email['file'];
+				$image['width'] = $image_email['width'];
+				$image['height'] = $image_email['height'];
+				$image['debug'] = 'HAR!';
+			} else {
+				$image['url'] =  $image_dir . $image_data['file'];
+				$image['width'] = $image_data['width'];
+				$image['height'] = $image_data['height'];
+			}
+				$image['subdir'] = $image_subdir;
+			$image_id = $image['id'];
 		}
 	}
-	
 	return $image;
 }
+
+// COMPOSE AND SEND EMAIL
+function sgs_emails_compose_and_send($email_address) {
+
+	$to = $email_address;
+	$subject = sgs_emails_choose_subject();
+
+	add_filter( 'wp_mail_from', 'sgs_mail_from' );
+	add_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
+	$headers[] = 'From: Sagesses <noreply@sagesses.biz>' . "\r\n";
+	$headers[] = 'Reply-To: Sagesses <sagessesinfos@gmail.com>' . "\r\n";
+	$headers[] = 'To: <' .$to. '>' . "\r\n";
+	// To send HTML mail, the Content-type header must be set
+	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
+	$headers[] = 'Content-type: text/html; charset=UTF-8' . "\r\n";
+
+	$image = sgs_emails_choose_image();
+	include "email-template.php";
+	$message = $email_template;
+	$sent = wp_mail( $to, $subject, $message, $headers);
+	remove_filter( 'wp_mail_from', 'sgs_wp_mail_from' );
+	remove_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
+	return $sent;
+}
+
+// SET CUSTOM MAIL FROM
+function sgs_mail_from( $original_email_address ) {
+	//Make sure the email is from the same domain 
+	//as your website to avoid being marked as spam.
+	return 'noreply@sagesses.biz';
+}
+function sgs_mail_from_name( $original_email_from ) {
+	return 'Sagesses';
+}
+
 ?>
