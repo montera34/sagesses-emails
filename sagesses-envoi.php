@@ -179,20 +179,31 @@ function sgs_emails_choose_image($email_address) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$pt = $settings['sgs_emails_settings_ptype'];
 
-	$args = array(
-		'post_type' => $pt,
-		'showposts' => 1,
-		'orderby' => 'rand'
-	);
 	$image_id = '';
 	while ( $image_id == '' ) {
+		$content_id = sgs_emails_current_get($email_address,'next');
+		if ( $content_id == '' ) {
+			$args = array(
+				'post_type' => $pt,
+				'showposts' => 1,
+				'orderby' => 'rand',
+				'post_parent' => 0
+			);
+		}
+		else {
+			$args = array(
+				'post_type' => $pt,
+				'p' => $content_id
+			);
+		}
+
 		$contents = get_posts($args);
 		$content = $contents[0];
 		if ( has_post_thumbnail($content->ID) ) {
 			$upload_dir = wp_get_upload_dir();
 			$image_dir = trailingslashit($upload_dir['baseurl']);
 			$image['id'] = get_post_thumbnail_id($content->ID);
-			$image['alt'] = $content->post_title;
+			$image['alt'] = __('Image','sgs_emails');
 			$image_data = wp_get_attachment_metadata($image['id']);
 			$image_subdir = ( preg_match('/\d{4}\/\d{2}/',$image_data['file'],$matches ) == 1 ) ? trailingslashit($matches[0]) : '';
 			$image_email = $image_data['sizes']['sgs_emails'];
@@ -208,6 +219,29 @@ function sgs_emails_choose_image($email_address) {
 			}
 				$image['subdir'] = $image_subdir;
 			$image_id = $image['id'];
+
+			$args = array(
+				'post_type' => $pt,
+				'showposts' => -1,
+				'post_parent' => $content->ID
+			);
+			$children = get_posts($args);
+
+			if ( count($children) >= 1 ) {
+				$ids[] = $content->ID;
+				foreach ( $children as $ch ) {
+					$ids[] = $ch->ID;
+				}
+				sgs_emails_current_update($email_address,$ids,1);
+			}
+			else {
+				sgs_emails_current_update($email_address);
+			
+			}
+		}
+		else {
+			$content_id = '';
+			sgs_emails_current_delete($email_address);
 		}
 	}
 	return $image;
@@ -273,6 +307,60 @@ function sgs_emails_action_per_address() {
 	}
 }
 
+
+////
+// CURRENT SERIES UPDATE, GET AND DELETE FUNCTIONS
+
+function sgs_emails_current_update($address,$new_current=0,$new_next=0) {
+	$series = (array) get_option( 'sgs_emails_current_series' );
+	if ( ! array_key_exists($address,$series) )
+		return false;
+
+	$current = $series[$address]['current'];
+	$next = $series[$address]['next'];
+
+	if ( $new_current == 0 && $new_next == 0 ) {
+		$series[$address]['next']++;
+		if ( $series[$address]['next'] == count($current) )
+			sgs_emails_current_delete($address);
+	}
+	else {
+		$series[$address]['current'] = $new_current;
+		$series[$address]['next'] = $new_next;
+	}
+	$updated = update_option('sgs_emails_current_series',$series);
+	return $updated;
+}
+
+function sgs_emails_current_get($address,$format) {
+	$series = (array) get_option( 'sgs_emails_current_series' );
+	if ( ! array_key_exists($address,$series) )
+		return false;
+
+	$log = $series[$address];
+
+	if ( $format == 'next' ) {
+		if ( $log['next'] == '' )
+			$requested_log = '';
+
+		$requested_log = $log['current'][$log['next']];
+	}
+	elseif ( $format == 'current') {
+		if ( $log['current'] == '' )
+			$requested_log = '';
+
+		$requested_log = $log['current'];
+	}
+	return $requested_log;
+}
+
+function sgs_emails_current_delete($address) {
+	$series = get_option('sgs_emails_current_series');
+	$series[$address]['next'] = '';
+	$series[$address]['current'] = '';
+	$updated = update_option('sgs_emails_current_series',$series);
+	return $updated;
+}
 
 ////
 // CRON TASKS
