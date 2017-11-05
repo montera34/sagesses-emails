@@ -187,13 +187,15 @@ function sgs_emails_choose_image($email_address) {
 				'post_type' => $pt,
 				'showposts' => 1,
 				'orderby' => 'rand',
-				'post_parent' => 0
+				'post_parent' => 0,
+				'post_status' => 'publish'
 			);
 		}
 		else {
 			$args = array(
 				'post_type' => $pt,
-				'p' => $content_id
+				'p' => $content_id,
+				'post_status' => 'publish'
 			);
 		}
 
@@ -206,7 +208,7 @@ function sgs_emails_choose_image($email_address) {
 			$image['alt'] = __('Image','sgs_emails');
 			$image_data = wp_get_attachment_metadata($image['id']);
 			$image_subdir = ( preg_match('/\d{4}\/\d{2}/',$image_data['file'],$matches ) == 1 ) ? trailingslashit($matches[0]) : '';
-			$image_email = $image_data['sizes']['sgs_emails'];
+			$image_email = $image_data['sizes']['sgs-emails'];
 			if ( is_array($image_email) && count($image_email) == 4 ) {
 				$image['url'] =  $image_dir . $image_subdir . $image_email['file'];
 				$image['width'] = $image_email['width'];
@@ -223,7 +225,11 @@ function sgs_emails_choose_image($email_address) {
 			$args = array(
 				'post_type' => $pt,
 				'showposts' => -1,
-				'post_parent' => $content->ID
+				'post_parent' => $content->ID,
+				'order' => 'ASC',
+				'orderby' => 'menu_order',
+				'post_status' => 'publish'
+
 			);
 			$children = get_posts($args);
 
@@ -256,10 +262,9 @@ function sgs_emails_compose_and_send($email_address) {
 	$to = $email_address;
 	$subject = sgs_emails_choose_subject();
 
-	add_filter( 'wp_mail_from', 'sgs_mail_from' );
-	add_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
-	$headers[] = 'Reply-To: '.$replyto_name.' <'.$replyto.'>' . "\r\n";
-	$headers[] = 'To: <' .$to. '>' . "\r\n";
+	//add_filter( 'wp_mail_from', 'sgs_mail_from' );
+	//add_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
+	//$headers[] = 'Reply-To: '.$replyto_name.' <'.$replyto.'>' . "\r\n";
 	// To send HTML mail, the Content-type header must be set
 	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
 	$headers[] = 'Content-type: text/html; charset=UTF-8' . "\r\n";
@@ -267,10 +272,13 @@ function sgs_emails_compose_and_send($email_address) {
 	$image = sgs_emails_choose_image($to);
 	include "email-template.php";
 	$message = $email_template;
+	// $message = "Testing";
 	$sent = wp_mail( $to, $subject, $message, $headers);
-	remove_filter( 'wp_mail_from', 'sgs_wp_mail_from' );
-	remove_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
+	//remove_filter( 'wp_mail_from', 'sgs_wp_mail_from' );
+	//remove_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
+
 	return $sent;
+
 }
 
 // DETERMINE WHEN TO SEND EMAIL
@@ -313,22 +321,21 @@ function sgs_emails_action_per_address() {
 
 function sgs_emails_current_update($address,$new_current=0,$new_next=0) {
 	$series = (array) get_option( 'sgs_emails_current_series' );
-	if ( ! array_key_exists($address,$series) )
-		return false;
-
-	$current = $series[$address]['current'];
-	$next = $series[$address]['next'];
+	if ( array_key_exists($address,$series) ) {
+		$current = $series[$address]['current'];
+		$next = $series[$address]['next'];
+	}
 
 	if ( $new_current == 0 && $new_next == 0 ) {
 		$series[$address]['next']++;
 		if ( $series[$address]['next'] == count($current) )
-			sgs_emails_current_delete($address);
+			$updated= sgs_emails_current_delete($address);
 	}
 	else {
 		$series[$address]['current'] = $new_current;
 		$series[$address]['next'] = $new_next;
+		$updated = update_option('sgs_emails_current_series',$series);
 	}
-	$updated = update_option('sgs_emails_current_series',$series);
 	return $updated;
 }
 
@@ -367,11 +374,11 @@ function sgs_emails_current_delete($address) {
 register_activation_hook( __FILE__, 'sgs_emails_set_wpcron' );
 function sgs_emails_set_wpcron() {
 
-	$time1 = strtotime('tomorrow 1:00');
-	$time2 = strtotime('tomorrow 3:00');
-	$time3 = strtotime('tomorrow 7:00');
-	$time4 = strtotime('tomorrow 9:00');
-	$time5 = strtotime('tomorrow 10:00');
+	$time1 = strtotime('tomorrow 9:00');
+	$time2 = strtotime('tomorrow 11:00');
+	$time3 = strtotime('tomorrow 13:00');
+	$time4 = strtotime('tomorrow 15:00');
+	$time5 = strtotime('tomorrow 17:00');
 
 	// Use wp_next_scheduled to check if the event is already scheduled
 	$timestamp1 = wp_next_scheduled( 'sgs_emails_set_cron_1' );
