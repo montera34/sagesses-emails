@@ -280,7 +280,7 @@ function sgs_emails_compose_and_send($email_address) {
 
 // DETERMINE WHEN TO SEND EMAIL
 function sgs_emails_if_send() {
-	$numbers = array(0,0,1);
+	$numbers = array(0,1,1);
 	$send = $numbers[array_rand($numbers)];
 	return $send;
 }
