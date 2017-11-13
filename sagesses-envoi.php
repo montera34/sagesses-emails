@@ -376,11 +376,11 @@ function sgs_emails_current_delete($address) {
 register_activation_hook( __FILE__, 'sgs_emails_set_wpcron' );
 function sgs_emails_set_wpcron() {
 
-	$time1 = strtotime('tomorrow 11:00');
-	$time2 = strtotime('tomorrow 12:00');
-	$time3 = strtotime('tomorrow 13:00');
-	$time4 = strtotime('tomorrow 14:00');
-	$time5 = strtotime('tomorrow 15:00');
+	$time1 = strtotime('tomorrow 10:30');
+	$time2 = strtotime('tomorrow 11:30');
+	$time3 = strtotime('tomorrow 15:00');
+	$time4 = strtotime('tomorrow 15:30');
+	$time5 = strtotime('tomorrow 16:30');
 
 	// Use wp_next_scheduled to check if the event is already scheduled
 	$timestamp1 = wp_next_scheduled( 'sgs_emails_set_cron_1' );
