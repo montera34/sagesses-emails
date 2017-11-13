@@ -213,7 +213,6 @@ function sgs_emails_choose_image($email_address) {
 				$image['url'] =  $image_dir . $image_subdir . $image_email['file'];
 				$image['width'] = $image_email['width'];
 				$image['height'] = $image_email['height'];
-				$image['debug'] = 'HAR!';
 			} else {
 				$image['url'] =  $image_dir . $image_data['file'];
 				$image['width'] = $image_data['width'];
@@ -229,7 +228,6 @@ function sgs_emails_choose_image($email_address) {
 				'order' => 'ASC',
 				'orderby' => 'menu_order',
 				'post_status' => 'publish'
-
 			);
 			$children = get_posts($args);
 
@@ -242,7 +240,6 @@ function sgs_emails_choose_image($email_address) {
 			}
 			else {
 				sgs_emails_current_update($email_address);
-			
 			}
 		}
 		else {
@@ -327,9 +324,14 @@ function sgs_emails_current_update($address,$new_current=0,$new_next=0) {
 	}
 
 	if ( $new_current == 0 && $new_next == 0 ) {
-		$series[$address]['next']++;
-		if ( $series[$address]['next'] == count($current) )
+		$new_next = ( $next == '' ) ? 1 : $next;
+		$series[$address]['next'] = ++$new_next;
+		if ( $series[$address]['next'] == count($current) ) {
 			$updated= sgs_emails_current_delete($address);
+		}
+		else {
+			$updated = update_option('sgs_emails_current_series',$series);
+		}
 	}
 	else {
 		$series[$address]['current'] = $new_current;
@@ -374,11 +376,11 @@ function sgs_emails_current_delete($address) {
 register_activation_hook( __FILE__, 'sgs_emails_set_wpcron' );
 function sgs_emails_set_wpcron() {
 
-	$time1 = strtotime('tomorrow 9:00');
-	$time2 = strtotime('tomorrow 11:00');
+	$time1 = strtotime('tomorrow 11:00');
+	$time2 = strtotime('tomorrow 12:00');
 	$time3 = strtotime('tomorrow 13:00');
-	$time4 = strtotime('tomorrow 15:00');
-	$time5 = strtotime('tomorrow 17:00');
+	$time4 = strtotime('tomorrow 14:00');
+	$time5 = strtotime('tomorrow 15:00');
 
 	// Use wp_next_scheduled to check if the event is already scheduled
 	$timestamp1 = wp_next_scheduled( 'sgs_emails_set_cron_1' );
