@@ -112,8 +112,18 @@ table{border-collapse:collapse !important;}
 </head>
 <body style="margin: 0; padding: 0;">
 
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+	<tbody><tr>
+		<td style="padding: 20px 15px 20px 15px; font-family: Helvetica, Arial, sans-serif;" bgcolor="#ffffff" align="left">
+			<table class="responsive-table" style="width: 100%!important" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+				<td style="padding: 0 0 0 0; font-size: 16px; line-height: 25px; color: #666666;" data-type="text" align="left">'.__('You are invited to do this right now:',"sgs-emails").'</td>
+			</tr></tbody></table>
+		</td>
+	</tr></tbody>
+</table>
+
 <table style="position: relative; opacity: 1; left: 0px; top: 0px;" cellspacing="0" cellpadding="0" border="0" width="100%"><tbody><tr>
-	<td style="padding: 0; font-family sans-serif;" class="section-padding edit-block" bgcolor="#ffffff" align="left">
+	<td style="padding:  20px 15px 20px 15px; font-family sans-serif;" class="section-padding edit-block" bgcolor="#ffffff" align="left">
 		<table class="responsive-table" cellspacing="0" cellpadding="0" border="0" width="500"><tbody><tr>
 			<td style="padding: 0 0 0 0;" class="padding-copy" align="left">
 			<div data-type="image">
