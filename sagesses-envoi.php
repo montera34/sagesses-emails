@@ -6,11 +6,20 @@ Version: 0.1
 Author: Montera34
 Author URI: https://montera34.com
 License: GPLv3
+Text Domain: sgs-emails
+Domain Path: /lang/
 */
 
 // VARIABLES
 $subjects_count = 10; // Maximum number of subjects for the emails to choose from
 $addresses_count = 20; // Maximum number of email addresses to send emails to
+
+// LOAD PLUGIN TEXT DOMAIN
+// FOR STRING TRANSLATIONS
+add_action( 'plugins_loaded', 'sgs_emails_load_textdomain' );
+function sgs_emails_load_textdomain() {
+	load_plugin_textdomain( 'sgs-emails', false, plugin_basename( dirname( __FILE__ ) ) . '/lang/' ); 
+}
 
 // ADD IMAGE SIZE FOR EMAIL CONTENT
 add_action( 'init', 'sgs_emails_image_size' );
@@ -20,7 +29,7 @@ function sgs_emails_image_size() {
 }
 function sgs_emails_image_size_names( $sizes ) {
 	return array_merge( $sizes, array(
-		'sgs-emails' => __('Sagesses Email plugin size','sgs_emails')
+		'sgs-emails' => __('Sagesses Email plugin size','sgs-emails')
 	) );
 }
 
@@ -31,7 +40,7 @@ function sgs_emails_image_size_names( $sizes ) {
 // ADD PLUGIN OPTION PAGE TO DASHBOARD
 add_action('admin_menu', 'sgs_emails_dashboard_page');
 function sgs_emails_dashboard_page() {
-	add_menu_page(__('Sagesses emails','sgs_emails'),'Sagesses emails ','moderate_comments','sagesses_emails', 'sgs_emails_dashboard_page_output','dashicons-email-alt',80);
+	add_menu_page(__('Sagesses emails','sgs-emails'),'Sagesses emails ','moderate_comments','sagesses_emails', 'sgs_emails_dashboard_page_output','dashicons-email-alt',80);
 }
 
 
@@ -43,23 +52,23 @@ function sgs_emails_register_settings() {
 	register_setting( 'sgs_emails_settings_group', 'sgs_emails_settings' );
 
 	// post type settings
-	add_settings_section( 'sgs_emails_settings_ptype_section', __('Post type','sgs_emails'), 'sgs_emails_settings_ptype_section_callback', 'sagesses_emails' );
-	add_settings_field( 'sgs_emails_settings_ptype', __('Post type for email content','sgs_emails'), 'sgs_emails_settings_ptype_callback', 'sagesses_emails', 'sgs_emails_settings_ptype_section' );
+	add_settings_section( 'sgs_emails_settings_ptype_section', __('Post type','sgs-emails'), 'sgs_emails_settings_ptype_section_callback', 'sagesses_emails' );
+	add_settings_field( 'sgs_emails_settings_ptype', __('Post type for email content','sgs-emails'), 'sgs_emails_settings_ptype_callback', 'sagesses_emails', 'sgs_emails_settings_ptype_section' );
 
 	// subjects list settings
-	add_settings_section( 'sgs_emails_settings_subjects_section', __('Subjects','sgs_emails'), 'sgs_emails_settings_subjects_section_callback', 'sagesses_emails' );
-	add_settings_field( 'sgs_emails_settings_subjects', __('List of subjects','sgs_emails'), 'sgs_emails_settings_subjects_callback', 'sagesses_emails', 'sgs_emails_settings_subjects_section' );
+	add_settings_section( 'sgs_emails_settings_subjects_section', __('Subjects','sgs-emails'), 'sgs_emails_settings_subjects_section_callback', 'sagesses_emails' );
+	add_settings_field( 'sgs_emails_settings_subjects', __('List of subjects','sgs-emails'), 'sgs_emails_settings_subjects_callback', 'sagesses_emails', 'sgs_emails_settings_subjects_section' );
 
 	// email addresses list settings
-	add_settings_section( 'sgs_emails_settings_addresses_section', __('Addresses','sgs_emails'), 'sgs_emails_settings_addresses_section_callback', 'sagesses_emails' );
-	add_settings_field( 'sgs_emails_settings_addresses', __('List of addresses','sgs_emails'), 'sgs_emails_settings_addresses_callback', 'sagesses_emails', 'sgs_emails_settings_addresses_section' );
+	add_settings_section( 'sgs_emails_settings_addresses_section', __('Addresses','sgs-emails'), 'sgs_emails_settings_addresses_section_callback', 'sagesses_emails' );
+	add_settings_field( 'sgs_emails_settings_addresses', __('List of addresses','sgs-emails'), 'sgs_emails_settings_addresses_callback', 'sagesses_emails', 'sgs_emails_settings_addresses_section' );
 
 	// email from and reply-to settings
-	add_settings_section( 'sgs_emails_settings_headers_section', __('Email headers','sgs_emails'), 'sgs_emails_settings_headers_section_callback', 'sagesses_emails' );
-	add_settings_field( 'sgs_emails_settings_from', __('From field (email address)','sgs_emails'), 'sgs_emails_settings_headers_from_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
-	add_settings_field( 'sgs_emails_settings_from_name', __('From field (name)','sgs_emails'), 'sgs_emails_settings_headers_from_name_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
-	add_settings_field( 'sgs_emails_settings_replyto', __('Reply-to field (email address)','sgs_emails'), 'sgs_emails_settings_headers_replyto_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
-	add_settings_field( 'sgs_emails_settings_replyto_name', __('Reply-to field (name)','sgs_emails'), 'sgs_emails_settings_headers_replyto_name_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
+	add_settings_section( 'sgs_emails_settings_headers_section', __('Email headers','sgs-emails'), 'sgs_emails_settings_headers_section_callback', 'sagesses_emails' );
+	add_settings_field( 'sgs_emails_settings_from', __('From field (email address)','sgs-emails'), 'sgs_emails_settings_headers_from_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
+	add_settings_field( 'sgs_emails_settings_from_name', __('From field (name)','sgs-emails'), 'sgs_emails_settings_headers_from_name_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
+	add_settings_field( 'sgs_emails_settings_replyto', __('Reply-to field (email address)','sgs-emails'), 'sgs_emails_settings_headers_replyto_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
+	add_settings_field( 'sgs_emails_settings_replyto_name', __('Reply-to field (name)','sgs-emails'), 'sgs_emails_settings_headers_replyto_name_callback', 'sagesses_emails', 'sgs_emails_settings_headers_section' );
 
 }
 
@@ -67,7 +76,7 @@ function sgs_emails_register_settings() {
 // CALLBACK FUNCTIONS
 // post type
 function sgs_emails_settings_ptype_section_callback() {
-	echo __('Choose a post type to feed the emails with content.','sgs_emails');
+	echo __('Choose a post type to feed the emails with content.','sgs-emails');
 }
 
 function sgs_emails_settings_ptype_callback() {
@@ -87,7 +96,7 @@ function sgs_emails_settings_ptype_callback() {
 
 // subjects list
 function sgs_emails_settings_subjects_section_callback() {
-	echo __('List of subjects for emails. When an email is sent, its subject will be chosen randomly from this list.','sgs_emails');
+	echo __('List of subjects for emails. When an email is sent, its subject will be chosen randomly from this list.','sgs-emails');
 }
 
 function sgs_emails_settings_subjects_callback() {
@@ -103,7 +112,7 @@ function sgs_emails_settings_subjects_callback() {
 
 // addresses list
 function sgs_emails_settings_addresses_section_callback() {
-	echo __('List of addresses to send emails to.','sgs_emails');
+	echo __('List of addresses to send emails to.','sgs-emails');
 }
 
 function sgs_emails_settings_addresses_callback() {
@@ -119,7 +128,7 @@ function sgs_emails_settings_addresses_callback() {
 
 // email from and reply-to headers
 function sgs_emails_settings_headers_section_callback() {
-	echo __('Headers for outgoing emails sent by this plugin.','sgs_emails');
+	echo __('Headers for outgoing emails sent by this plugin.','sgs-emails');
 }
 
 function sgs_emails_settings_headers_from_callback() {
@@ -149,7 +158,7 @@ function sgs_emails_settings_headers_replyto_name_callback() {
 // GENERATE OUTPUT
 function sgs_emails_dashboard_page_output() { ?>
 	<div class="wrap">
-		<h2><?php _e('Sagesses send emails tool','sgs'); ?></h2>
+		<h2><?php _e('Sagesses send emails tool','sgs-emails'); ?></h2>
 		<form method="post" action="options.php">
 			<?php settings_fields( 'sgs_emails_settings_group' ); ?>
 			<?php do_settings_sections( 'sagesses_emails' ); ?>
@@ -215,7 +224,7 @@ function sgs_emails_choose_image($email_address) {
 			$upload_dir = wp_get_upload_dir();
 			$image_dir = trailingslashit($upload_dir['baseurl']);
 			$image['id'] = get_post_thumbnail_id($content->ID);
-			$image['alt'] = __('Image','sgs_emails');
+			$image['alt'] = __('Image','sgs-emails');
 			$image_data = wp_get_attachment_metadata($image['id']);
 			$image_subdir = ( preg_match('/\d{4}\/\d{2}/',$image_data['file'],$matches ) == 1 ) ? trailingslashit($matches[0]) : '';
 			$image_email = $image_data['sizes']['sgs-emails'];
