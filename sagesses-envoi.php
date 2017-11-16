@@ -162,6 +162,16 @@ function sgs_emails_dashboard_page_output() { ?>
 // end PLUGIN PAGE IN DASHBOARD
 ////
 
+// GENERATE RANDOM STRING
+function sgs_emails_random_string($length = 16) {
+	$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	$charactersLength = strlen($characters);
+	$randomString = '';
+	for ($i = 0; $i < $length; $i++) {
+		$randomString .= $characters[mt_rand(0, $charactersLength - 1)];
+	}
+	return $randomString;
+}
 
 // CHOOSE SUBJECT FOR EMAIL
 function sgs_emails_choose_subject() {
@@ -256,6 +266,8 @@ function sgs_emails_compose_and_send($email_address) {
 	$replyto = $settings['sgs_emails_settings_replyto'];
 	$replyto_name = $settings['sgs_emails_settings_replyto_name'];
 
+	//$boundary = sgs_emails_random_string();
+
 	$to = $email_address;
 	$subject = sgs_emails_choose_subject();
 
@@ -265,6 +277,8 @@ function sgs_emails_compose_and_send($email_address) {
 	// To send HTML mail, the Content-type header must be set
 	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
 	$headers[] = 'Content-type: text/html; charset=UTF-8' . "\r\n";
+	//$headers[] = 'Content-type: multipart/alternative' . "\r\n";
+	//$headers[] = 'boundary="'.$boundary.'"' . "\r\n";
 
 	$image = sgs_emails_choose_image($to);
 	include "email-template.php";
@@ -376,11 +390,11 @@ function sgs_emails_current_delete($address) {
 register_activation_hook( __FILE__, 'sgs_emails_set_wpcron' );
 function sgs_emails_set_wpcron() {
 
-	$time1 = strtotime('tomorrow 10:30');
-	$time2 = strtotime('tomorrow 11:30');
-	$time3 = strtotime('tomorrow 15:00');
-	$time4 = strtotime('tomorrow 15:30');
-	$time5 = strtotime('tomorrow 16:30');
+	$time1 = strtotime('tomorrow 09:30');
+	$time2 = strtotime('tomorrow 10:30');
+	$time3 = strtotime('tomorrow 14:00');
+	$time4 = strtotime('tomorrow 14:30');
+	$time5 = strtotime('tomorrow 15:30');
 
 	// Use wp_next_scheduled to check if the event is already scheduled
 	$timestamp1 = wp_next_scheduled( 'sgs_emails_set_cron_1' );
