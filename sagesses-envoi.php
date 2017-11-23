@@ -159,6 +159,7 @@ function sgs_emails_settings_headers_replyto_name_callback() {
 function sgs_emails_dashboard_page_output() { ?>
 	<div class="wrap">
 		<h2><?php _e('Sagesses send emails tool','sgs-emails'); ?></h2>
+<?php echo sgs_emails_action_per_address(); ?>
 		<form method="post" action="options.php">
 			<?php settings_fields( 'sgs_emails_settings_group' ); ?>
 			<?php do_settings_sections( 'sagesses_emails' ); ?>
@@ -325,6 +326,11 @@ function sgs_mail_from_name( $original_email_from ) {
 
 // ACTION PER ADDRESS
 function sgs_emails_action_per_address() {
+	$dw = date('w');
+	// if saturday or sunday, do nothing
+	if ( $dw == '0' || $dw == '6' )
+		return;
+
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$addresses = $settings['sgs_emails_settings_addresses'];
 	foreach ( $addresses as $a ) {
