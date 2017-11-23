@@ -159,7 +159,6 @@ function sgs_emails_settings_headers_replyto_name_callback() {
 function sgs_emails_dashboard_page_output() { ?>
 	<div class="wrap">
 		<h2><?php _e('Sagesses send emails tool','sgs-emails'); ?></h2>
-<?php echo sgs_emails_action_per_address(); ?>
 		<form method="post" action="options.php">
 			<?php settings_fields( 'sgs_emails_settings_group' ); ?>
 			<?php do_settings_sections( 'sagesses_emails' ); ?>
