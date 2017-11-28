@@ -272,10 +272,13 @@ function sgs_emails_choose_image($email_address) {
 // COMPOSE AND SEND EMAIL
 function sgs_emails_compose_and_send($email_address) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
+	$from = $settings['sgs_emails_settings_from'];
+	$from_name = $settings['sgs_emails_settings_from_name'];
 	$replyto = $settings['sgs_emails_settings_replyto'];
 	$replyto_name = $settings['sgs_emails_settings_replyto_name'];
 
-	//$boundary = sgs_emails_random_string();
+//	$boundary = sgs_emails_random_string();
+	//$boundary = str_replace(" ", "", date('l jS \of F Y h i s A'));
 
 	$to = $email_address;
 	$subject = sgs_emails_choose_subject();
@@ -284,8 +287,8 @@ function sgs_emails_compose_and_send($email_address) {
 	//add_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
 	//$headers[] = 'Reply-To: '.$replyto_name.' <'.$replyto.'>' . "\r\n";
 	// To send HTML mail, the Content-type header must be set
-	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
-	$headers[] = 'Content-type: text/html; charset=UTF-8' . "\r\n";
+//	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
+//	$headers[] = 'Content-type: text/html; charset=UTF-8' . "\r\n";
 	//$headers[] = 'Content-type: multipart/alternative' . "\r\n";
 	//$headers[] = 'boundary="'.$boundary.'"' . "\r\n";
 
@@ -293,12 +296,29 @@ function sgs_emails_compose_and_send($email_address) {
 	include "email-template.php";
 	$message = $email_template;
 	// $message = "Testing";
-	$sent = wp_mail( $to, $subject, $message, $headers);
+//	$sent = wp_mail( $to, $subject, $message, $headers);
 	//remove_filter( 'wp_mail_from', 'sgs_wp_mail_from' );
 	//remove_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
 
-	return $sent;
 
+$newline  = "\r\n";
+
+$headers = "From: $from_name <$from>$newline".
+	"Reply-To: $replyto_name <$replyto>$newline".
+	"MIME-Version: 1.0$newline".
+//           "Content-Type: multipart/alternative;".
+//          "Content-Type: multipart/related;".
+//           "boundary = \"$boundary\"$newline$newline".
+//           "--$boundary$newline".
+	"Content-Type: text/html; charset=UTF-8$newline".
+	"Content-Transfer-Encoding: base64$newline$newline";
+
+$body= rtrim(chunk_split(base64_encode($message)));
+
+$sent = mail($to,$subject,$body,$headers);
+//mail($to,$subject,"the content");
+//echo 'HAR!';
+	return $sent;
 }
 
 // DETERMINE WHEN TO SEND EMAIL
