@@ -238,12 +238,13 @@ function sgs_emails_choose_image($email_address) {
 				$image['filename'] = $image_email['file'];
 			} else {
 				$image['url'] =  $image_dir . $image_data['file'];
+				$image['path'] = $image_dir_path . $image_data['file'];
 				$image['width'] = $image_data['width'];
 				$image['height'] = $image_data['height'];
-				$image['mime-type'] = $image_data['thumbnail']['mime-type'];
+				$image['mime-type'] = get_post_mime_type( $image['id'] );
 				$image['filename'] = $image_data['file'];
 			}
-				$image['subdir'] = $image_subdir;
+			$image['subdir'] = $image_subdir;
 			$image_id = $image['id'];
 
 			$args = array(
