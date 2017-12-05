@@ -221,21 +221,27 @@ function sgs_emails_choose_image($email_address) {
 		$contents = get_posts($args);
 		$content = $contents[0];
 		if ( has_post_thumbnail($content->ID) ) {
-			$upload_dir = wp_get_upload_dir();
-			$image_dir = trailingslashit($upload_dir['baseurl']);
 			$image['id'] = get_post_thumbnail_id($content->ID);
 			$image['alt'] = __('Image','sgs-emails');
 			$image_data = wp_get_attachment_metadata($image['id']);
 			$image_subdir = ( preg_match('/\d{4}\/\d{2}/',$image_data['file'],$matches ) == 1 ) ? trailingslashit($matches[0]) : '';
+			$upload_dir = wp_get_upload_dir();
+			$image_dir = trailingslashit($upload_dir['baseurl']);
+			$image_dir_path = trailingslashit($upload_dir['basedir']);
 			$image_email = $image_data['sizes']['sgs-emails'];
 			if ( is_array($image_email) && count($image_email) == 4 ) {
 				$image['url'] =  $image_dir . $image_subdir . $image_email['file'];
+				$image['path'] = $image_dir_path . $image_subdir . $image_email['file'];
 				$image['width'] = $image_email['width'];
 				$image['height'] = $image_email['height'];
+				$image['mime-type'] = $image_email['mime-type'];
+				$image['filename'] = $image_email['file'];
 			} else {
 				$image['url'] =  $image_dir . $image_data['file'];
 				$image['width'] = $image_data['width'];
 				$image['height'] = $image_data['height'];
+				$image['mime-type'] = $image_data['thumbnail']['mime-type'];
+				$image['filename'] = $image_data['file'];
 			}
 				$image['subdir'] = $image_subdir;
 			$image_id = $image['id'];
@@ -278,47 +284,83 @@ function sgs_emails_compose_and_send($email_address) {
 	$replyto_name = $settings['sgs_emails_settings_replyto_name'];
 
 //	$boundary = sgs_emails_random_string();
-	//$boundary = str_replace(" ", "", date('l jS \of F Y h i s A'));
+//	$boundary_alt = sgs_emails_random_string();
+//	$boundary_rel = sgs_emails_random_string();
+//	$newline  = "\r\n";
 
 	$to = $email_address;
 	$subject = sgs_emails_choose_subject();
-
 	//add_filter( 'wp_mail_from', 'sgs_mail_from' );
 	//add_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
 	//$headers[] = 'Reply-To: '.$replyto_name.' <'.$replyto.'>' . "\r\n";
 	// To send HTML mail, the Content-type header must be set
 //	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
 //	$headers[] = 'Content-type: text/html; charset=UTF-8' . "\r\n";
-	//$headers[] = 'Content-type: multipart/alternative' . "\r\n";
-	//$headers[] = 'boundary="'.$boundary.'"' . "\r\n";
+//	$headers[] = 'Content-type: multipart/related' . "\r\n";
+//	$headers[] = 'boundary="'.$boundary_alt.'"' . "\r\n";
 
 	$image = sgs_emails_choose_image($to);
+//	$img_b64 = base64_encode(file_get_contents($image['url']));
+	//$file = $image['url']; //phpmailer will load this file
+	$related_file = $image['path'];
+	$related_cid = sgs_emails_random_string();; //will map it to this UID
+	$related_name = $image['filename']; //this will be the file name for the attachment
+
 	include "email-template.php";
-	$message = $email_template;
+	$body = $email_template;
 	// $message = "Testing";
-//	$sent = wp_mail( $to, $subject, $message, $headers);
+//global $phpmailer;
+$sgs_emails_phpmailer = function(&$phpmailer)use($related_file,$related_cid,$related_name,$from,$from_name,$replyto,$replyto_name){
+
+	$phpmailer->SMTPKeepAlive = true;
+	$phpmailer->IsHTML(true);
+//	$headers = 'Content-type: multipart/alternative\n';
+//	$headers .= 'MIME-Version: 1.0\n';
+//	$phpmailer->AddCustomHeader($headers);
+	$phpmailer->AddEmbeddedImage($related_file, $related_cid, $related_name);
+	$phpmailer->From = $from;
+	$phpmailer->FromName = $from_name;
+	$phpmailer->AddReplyTo($replyto, $replyto_name);
+};
+	add_action( 'phpmailer_init',$sgs_emails_phpmailer);
+	$sent = wp_mail( $to, $subject, $body);
+	remove_action('phpmailer_init', $sgs_emails_phpmailer);
 	//remove_filter( 'wp_mail_from', 'sgs_wp_mail_from' );
 	//remove_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
+//$body= rtrim(chunk_split(base64_encode($message)));
 
 
-$newline  = "\r\n";
+//	$headers =
+//	'Content-Type: multipart/related; boundary="'.$boundary_rel.'"'.$newline.
+//	'MIME-Version: 1.0'.$newline.
+//	'From: '.$from_name.' <'.$from.'>'.$newline.
+//	'Reply-To: '.$replyto_name.' <'.$replyto.'>'.$newline.$newline
 
-$headers = "From: $from_name <$from>$newline".
-	"Reply-To: $replyto_name <$replyto>$newline".
-	"MIME-Version: 1.0$newline".
-//           "Content-Type: multipart/alternative;".
-//          "Content-Type: multipart/related;".
-//           "boundary = \"$boundary\"$newline$newline".
-//           "--$boundary$newline".
-	"Content-Type: text/html; charset=UTF-8$newline".
-	"Content-Transfer-Encoding: base64$newline$newline";
+//	"Content-Type: multipart/related; boundary=\"$boundary_rel\"$newline".
+//	"MIME-Version: 1.0$newline".
+//	"From: $from_name <$from>$newline".
+//	"Reply-To: $replyto_name <$replyto>$newline$newline"
+       
+       //          "Content-Type: multipart/alternative;".
+  //         "$boundary$newline".
+//	"Content-Type: text/html; charset=UTF-8$newline".
+////	"Content-Transfer-Encoding: base64$newline$newline";
+//	"Content-Transfer-Encoding: 7bit$newline$newline";
+	;
 
-$body= rtrim(chunk_split(base64_encode($message)));
-
-$sent = mail($to,$subject,$body,$headers);
+//$sent = mail($to,$subject,$body,$headers);
+//$sent = mail($to,$subject,$body);
 //mail($to,$subject,"the content");
 //echo 'HAR!';
+//	require_once ABSPATH . WPINC . '/class-phpmailer.php';
+//	global $phpmailer;
+//	$mail = new PHPMailer();
+//	return $image['path'];
 	return $sent;
+	//return $img_b64;
+
+
+
 }
 
 // DETERMINE WHEN TO SEND EMAIL

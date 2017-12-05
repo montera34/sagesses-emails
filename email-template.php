@@ -1,6 +1,15 @@
 <?php
-$email_template = '
-<!DOCTYPE html>
+$email_template = 
+//'--'.$boundary_rel.$newline.
+////'This is a multi-part message in MIME format.'.$newline.
+//'Content-type:multipart/alternative; boundary="'.$boundary_alt.'"'.$newline.
+//'MIME-Version: 1.0'.$newline.$newline.
+//'--'.$boundary_alt.$newline.
+//'Content-Type: text/html; charset=UTF-8'.$newline.
+//'MIME-Version: 1.0'.$newline.
+//'Content-Transfer-Encoding: 7bit'.$newline.$newline.
+
+'<!DOCTYPE html>
 <html>
 <head>
 <title>Sagesses emails</title>
@@ -127,7 +136,7 @@ table{border-collapse:collapse !important;}
 		<table class="responsive-table" cellspacing="0" cellpadding="0" border="0" width="500"><tbody><tr>
 			<td style="padding: 0 0 0 0;" class="padding-copy" align="left">
 			<div data-type="image">
-				<img src="'.$image['url'].'" alt="'.$image['alt'].'" style="max-width: 100%!important; width: '.$image['width'].'px!important; height: auto!important; display: block; color: #666666;  font-family: sans-serif; font-size: 16px;" class="img-max" border="0" width="'.$image['width'].'" />
+				<img src="cid:'.$related_cid.'" alt="'.$image['alt'].'" style="max-width: 100%!important; width: '.$image['width'].'px!important; height: auto!important; display: block; color: #666666;  font-family: sans-serif; font-size: 16px;" class="img-max" border="0" width="'.$image['width'].'" />
 			</div>
 			</td>
 		</tr></tbody></table>
@@ -135,6 +144,20 @@ table{border-collapse:collapse !important;}
 </tr></tbody></table>
 
 </body>
-</html>
-';
+</html>'
+//.$newline.$newline.
+
+//'--'.$boundary_alt.'--'.$newline.$newline.
+
+//'--'.$boundary_rel.$newline.
+//'Content-Type: '.$image['mime-type'].'; name="'.$image['filename'].'"'.$newline.
+//'MIME-Version: 1.0'.$newline.
+//'Content-Transfer-Encoding: base64'.$newline.
+//'Content-ID: <part1.06090408.01060107>'.$newline.
+//'Content-Disposition: inline; filename="'.$image['filename'].'"'.$newline.$newline.
+
+//$img_b64.$newline.$newline.
+
+//'--'.$boundary_rel.'--'
+;
 ?>
