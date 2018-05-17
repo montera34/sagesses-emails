@@ -311,7 +311,7 @@ function sgs_emails_compose_and_send($email_address) {
 	$body = $email_template;
 	// $message = "Testing";
 //global $phpmailer;
-$sgs_emails_phpmailer = function(&$phpmailer)use($related_file,$related_cid,$related_name,$from,$from_name,$replyto,$replyto_name){
+	$sgs_emails_phpmailer = function(&$phpmailer)use($related_file,$related_cid,$related_name,$from,$from_name,$replyto,$replyto_name){
 
 	$phpmailer->SMTPKeepAlive = true;
 	$phpmailer->IsHTML(true);
@@ -322,7 +322,7 @@ $sgs_emails_phpmailer = function(&$phpmailer)use($related_file,$related_cid,$rel
 	$phpmailer->From = $from;
 	$phpmailer->FromName = $from_name;
 	$phpmailer->AddReplyTo($replyto, $replyto_name);
-};
+	};
 	add_action( 'phpmailer_init',$sgs_emails_phpmailer);
 	$sent = wp_mail( $to, $subject, $body);
 	remove_action('phpmailer_init', $sgs_emails_phpmailer);
@@ -360,13 +360,11 @@ $sgs_emails_phpmailer = function(&$phpmailer)use($related_file,$related_cid,$rel
 	return $sent;
 	//return $img_b64;
 
-
-
 }
 
 // DETERMINE WHEN TO SEND EMAIL
 function sgs_emails_if_send() {
-	$numbers = array(0,0,1);
+	$numbers = array(0,1,1);
 	$send = $numbers[array_rand($numbers)];
 	return $send;
 }
@@ -389,8 +387,12 @@ function sgs_mail_from_name( $original_email_from ) {
 // ACTION PER ADDRESS
 function sgs_emails_action_per_address() {
 	$dw = date('w');
+	$ch = date('dm');
 	// if saturday or sunday, do nothing
 	if ( $dw == '0' || $dw == '6' )
+		return;
+	// if christmas holidays, do nothing
+	if ( $ch == '2412' || $ch == '2512' || $ch == '2612' || $ch == '2712' || $ch == '2812' || $ch == '2912' || $ch == '3012' || $ch == '3112' || $ch == '0101' || $ch == '0201' )
 		return;
 
 	$settings = (array) get_option( 'sgs_emails_settings' );
