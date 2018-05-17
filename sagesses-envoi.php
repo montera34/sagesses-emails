@@ -55,6 +55,10 @@ function sgs_emails_register_settings() {
 	add_settings_section( 'sgs_emails_settings_ptype_section', __('Post type','sgs-emails'), 'sgs_emails_settings_ptype_section_callback', 'sagesses_emails' );
 	add_settings_field( 'sgs_emails_settings_ptype', __('Post type for email content','sgs-emails'), 'sgs_emails_settings_ptype_callback', 'sagesses_emails', 'sgs_emails_settings_ptype_section' );
 
+	// send probability
+	add_settings_section( 'sgs_emails_settings_probability_section', __('Send probability','sgs-emails'), 'sgs_emails_settings_probability_section_callback', 'sagesses_emails' );
+	add_settings_field( 'sgs_emails_settings_probability', __('Probability','sgs-emails'), 'sgs_emails_settings_probability_callback', 'sagesses_emails', 'sgs_emails_settings_probability_section' );
+
 	// subjects list settings
 	add_settings_section( 'sgs_emails_settings_subjects_section', __('Subjects','sgs-emails'), 'sgs_emails_settings_subjects_section_callback', 'sagesses_emails' );
 	add_settings_field( 'sgs_emails_settings_subjects', __('List of subjects','sgs-emails'), 'sgs_emails_settings_subjects_callback', 'sagesses_emails', 'sgs_emails_settings_subjects_section' );
@@ -92,6 +96,47 @@ function sgs_emails_settings_ptype_callback() {
 		$options .= ( $pt == $ptype ) ? '<option value="'.$pt.'" selected>'.$pt.'</option>' : '<option value="'.$pt.'">'.$pt.'</option>';
 	}
 	echo "<select name='sgs_emails_settings[sgs_emails_settings_ptype]'>".$options."</select>";
+}
+
+// send probability
+function sgs_emails_settings_probability_section_callback() {
+	echo __('Choose the probability to send emails at each send time.','sgs-emails');
+}
+
+function sgs_emails_settings_probability_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$prob = esc_attr( $settings['sgs_emails_settings_probability'] );
+	$options = '';
+	$probs = array(
+		array(
+			'l' => __('0% - Sends are halted','sgs-emails'),
+			'v' => '0'
+		),
+		array(
+			'l' => __('25%','sgs-emails'),
+			'v' => '25'
+		),
+		array(
+			'l' => __('33%','sgs-emails'),
+			'v' => '33'
+		),
+		array(
+			'l' => __('50%','sgs-emails'),
+			'v' => '50'
+		),
+		array(
+			'l' => __('66%','sgs-emails'),
+			'v' => '66'
+		),
+		array(
+			'l' => __('100%','sgs-emails'),
+			'v' => '100'
+		)
+	);
+	foreach ( $probs as $p ) {
+		$options .= ( $p['v'] == $prob ) ? '<option value="'.$p['v'].'" selected>'.$p['l'].'</option>' : '<option value="'.$p['v'].'">'.$p['l'].'</option>';
+	}
+	echo "<select name='sgs_emails_settings[sgs_emails_settings_probability]'>".$options."</select>";
 }
 
 // subjects list
@@ -364,8 +409,24 @@ function sgs_emails_compose_and_send($email_address) {
 
 // DETERMINE WHEN TO SEND EMAIL
 function sgs_emails_if_send() {
-	$numbers = array(0,1,1);
-	$send = $numbers[array_rand($numbers)];
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$prob = $settings['sgs_emails_settings_probability'];
+
+	switch ($prob) {
+	case "0":
+		$n = array(0);
+	case "25":
+		$n = array(0,0,0,1);
+	case "33":
+		$n = array(0,0,1);
+	case "50":
+		$n = array(0,1);
+	case "66":
+		$n = array(0,1,1,1);
+	case "100":
+		$n = array(1);
+	}
+	$send = $n[array_rand($n)];
 	return $send;
 }
 
