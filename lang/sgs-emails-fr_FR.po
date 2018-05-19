@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sgs_emails\n"
-"POT-Creation-Date: 2017-11-16 11:16+0100\n"
-"PO-Revision-Date: 2017-11-16 12:27+0100\n"
+"POT-Creation-Date: 2018-05-19 11:01+0200\n"
+"PO-Revision-Date: 2018-05-19 11:05+0200\n"
 "Last-Translator: Alfonso Sánchez Uzábal <skotperez@voragine.net>\n"
 "Language-Team: Montera34\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.3\n"
+"X-Generator: Poedit 2.0.6\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Poedit-KeywordsList: __;_e;_x\n"
@@ -17,68 +17,103 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: languages\n"
 "X-Poedit-SearchPathExcluded-1: .git\n"
 
-#: email-template.php:119
+#: email-template.php:128
 msgid "You are invited to do this right now:"
 msgstr "Vous êtes invité(e) à appliquer à l’instant:"
 
-#: sagesses-envoi.php:23
+#: sagesses-envoi.php:32
 msgid "Sagesses Email plugin size"
 msgstr "Taille du module Sagesses émail"
 
-#: sagesses-envoi.php:34
+#: sagesses-envoi.php:43
 msgid "Sagesses emails"
 msgstr "Sagesses emails"
 
-#: sagesses-envoi.php:46
+#: sagesses-envoi.php:55
 msgid "Post type"
 msgstr "Type de contenu"
 
-#: sagesses-envoi.php:47
+#: sagesses-envoi.php:56
 msgid "Post type for email content"
 msgstr "Type de contenu pour les emails"
 
-#: sagesses-envoi.php:50
+#: sagesses-envoi.php:59
+msgid "Send probability"
+msgstr "Probabilité d'envoi"
+
+#: sagesses-envoi.php:60
+msgid "Probability"
+msgstr "Probabilité"
+
+#: sagesses-envoi.php:63
 msgid "Subjects"
 msgstr "Objets"
 
-#: sagesses-envoi.php:51
+#: sagesses-envoi.php:64
 msgid "List of subjects"
 msgstr "Liste d'objets"
 
-#: sagesses-envoi.php:54
+#: sagesses-envoi.php:67
 msgid "Addresses"
 msgstr "Adresses"
 
-#: sagesses-envoi.php:55
+#: sagesses-envoi.php:68
 msgid "List of addresses"
 msgstr "Liste d'adresses"
 
-#: sagesses-envoi.php:58
+#: sagesses-envoi.php:71
 msgid "Email headers"
 msgstr "En-têtes des emails"
 
-#: sagesses-envoi.php:59
+#: sagesses-envoi.php:72
 msgid "From field (email address)"
 msgstr "From (émail adresse)"
 
-#: sagesses-envoi.php:60
+#: sagesses-envoi.php:73
 msgid "From field (name)"
 msgstr "From (nom)"
 
-#: sagesses-envoi.php:61
+#: sagesses-envoi.php:74
 msgid "Reply-to field (email address)"
 msgstr "Reply-to (émail adresse)"
 
-#: sagesses-envoi.php:62
+#: sagesses-envoi.php:75
 msgid "Reply-to field (name)"
 msgstr "Reply-to (nom)"
 
-#: sagesses-envoi.php:70
+#: sagesses-envoi.php:83
 msgid "Choose a post type to feed the emails with content."
-msgstr ""
-"Choisissez un type de contenu pour montrer de contenu dans les emails."
+msgstr "Choisissez un type de contenu pour montrer de contenu dans les emails."
 
-#: sagesses-envoi.php:90
+#: sagesses-envoi.php:103
+msgid "Choose the probability to send emails at each send time."
+msgstr "Choisir la probabilité d'envoi d'émails à chaque envoi"
+
+#: sagesses-envoi.php:112
+msgid "0% - Sends are halted"
+msgstr "0% - Les envois sont arrêtés"
+
+#: sagesses-envoi.php:116
+msgid "25%"
+msgstr "25%"
+
+#: sagesses-envoi.php:120
+msgid "33%"
+msgstr "33%"
+
+#: sagesses-envoi.php:124
+msgid "50%"
+msgstr "50%"
+
+#: sagesses-envoi.php:128
+msgid "66%"
+msgstr "66%"
+
+#: sagesses-envoi.php:132
+msgid "100%"
+msgstr "100%"
+
+#: sagesses-envoi.php:144
 msgid ""
 "List of subjects for emails. When an email is sent, its subject will be "
 "chosen randomly from this list."
@@ -86,18 +121,18 @@ msgstr ""
 "Liste d'objets pour les emails. Quand un email est envoyé, l'objet sera "
 "choisi d'une façon aléatoire."
 
-#: sagesses-envoi.php:106
+#: sagesses-envoi.php:160
 msgid "List of addresses to send emails to."
 msgstr "Liste de destinataires."
 
-#: sagesses-envoi.php:122
+#: sagesses-envoi.php:176
 msgid "Headers for outgoing emails sent by this plugin."
 msgstr "En-têtes pour les email envoyés par ce module."
 
-#: sagesses-envoi.php:152
+#: sagesses-envoi.php:206
 msgid "Sagesses send emails tool"
 msgstr "Outil de Sagesses pour l'envoi des emails"
 
-#: sagesses-envoi.php:219
+#: sagesses-envoi.php:270
 msgid "Image"
 msgstr "Image"
