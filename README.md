@@ -16,8 +16,9 @@ It has been developped by [Montera34](https://montera34.com) for [Sagesses](http
 4. Go to the plugin configuration page, Sagesses Emails, to set up the plugin:
 	+ List the subjects for the emails
 	+ List the addresses to send the emails to.
-	+ Choose the custom post type that is foing to feed the content of your emails.
+	+ Choose the custom post type that is going to feed the contents of your emails.
 
 ## Suggested Plugins
 
-* [Pods Framework](http://www.podsframework.org/)
+* [Pods Framework](http://www.podsframework.org/). To create the custom post type for email content.
+* [WP Crontrol](https://wordpress.org/plugins/wp-crontrol/). To control cron tasks.
