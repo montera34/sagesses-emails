@@ -1,14 +1,5 @@
 <?php
 $email_template = 
-//'--'.$boundary_rel.$newline.
-////'This is a multi-part message in MIME format.'.$newline.
-//'Content-type:multipart/alternative; boundary="'.$boundary_alt.'"'.$newline.
-//'MIME-Version: 1.0'.$newline.$newline.
-//'--'.$boundary_alt.$newline.
-//'Content-Type: text/html; charset=UTF-8'.$newline.
-//'MIME-Version: 1.0'.$newline.
-//'Content-Transfer-Encoding: 7bit'.$newline.$newline.
-
 '<!DOCTYPE html>
 <html>
 <head>
@@ -143,21 +134,18 @@ table{border-collapse:collapse !important;}
 	</td>
 </tr></tbody></table>
 
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+	<tbody><tr>
+		<td style="padding: 20px 15px 20px 15px; font-family: Helvetica, Arial, sans-serif;" bgcolor="#ffffff" align="left">
+			<table class="responsive-table" style="width: 100%!important" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+				<td style="padding: 0 0 0 0; font-size: 16px; line-height: 25px; color: #666666;" data-type="text" align="left">'.__("You can unsuscribe from this newsletter when you want: just send an email to ccilica@gmail.com","sgs-emails").'</td>
+			</tr></tbody></table>
+		</td>
+	</tr></tbody>
+</table>
+
+
 </body>
 </html>'
-//.$newline.$newline.
-
-//'--'.$boundary_alt.'--'.$newline.$newline.
-
-//'--'.$boundary_rel.$newline.
-//'Content-Type: '.$image['mime-type'].'; name="'.$image['filename'].'"'.$newline.
-//'MIME-Version: 1.0'.$newline.
-//'Content-Transfer-Encoding: base64'.$newline.
-//'Content-ID: <part1.06090408.01060107>'.$newline.
-//'Content-Disposition: inline; filename="'.$image['filename'].'"'.$newline.$newline.
-
-//$img_b64.$newline.$newline.
-
-//'--'.$boundary_rel.'--'
 ;
 ?>

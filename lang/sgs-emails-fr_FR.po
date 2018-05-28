@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sgs_emails\n"
-"POT-Creation-Date: 2018-05-19 11:01+0200\n"
-"PO-Revision-Date: 2018-05-19 11:05+0200\n"
+"POT-Creation-Date: 2018-05-19 13:27+0200\n"
+"PO-Revision-Date: 2018-05-19 13:27+0200\n"
 "Last-Translator: Alfonso Sánchez Uzábal <skotperez@voragine.net>\n"
 "Language-Team: Montera34\n"
 "Language: fr_FR\n"
@@ -20,6 +20,14 @@ msgstr ""
 #: email-template.php:128
 msgid "You are invited to do this right now:"
 msgstr "Vous êtes invité(e) à appliquer à l’instant:"
+
+#: email-template.php:150
+msgid ""
+"You can unsuscribe from this newsletter when you want: just send an email to "
+"ccilica@gmail.com"
+msgstr ""
+"À tout moment vous pouvez arrêter l'envoi de ces rappels, en le demandant "
+"par mail à ccilica@gmail.com"
 
 #: sagesses-envoi.php:32
 msgid "Sagesses Email plugin size"
@@ -87,7 +95,7 @@ msgstr "Choisissez un type de contenu pour montrer de contenu dans les emails."
 
 #: sagesses-envoi.php:103
 msgid "Choose the probability to send emails at each send time."
-msgstr "Choisir la probabilité d'envoi d'émails à chaque envoi"
+msgstr "Choisir la probabilité d'envoi d'émails à chaque envoi."
 
 #: sagesses-envoi.php:112
 msgid "0% - Sends are halted"
