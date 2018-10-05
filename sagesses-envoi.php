@@ -12,7 +12,7 @@ Domain Path: /lang/
 
 // VARIABLES
 $subjects_count = 10; // Maximum number of subjects for the emails to choose from
-$addresses_count = 20; // Maximum number of email addresses to send emails to
+$addresses_count = 30; // Maximum number of email addresses to send emails to
 
 // LOAD PLUGIN TEXT DOMAIN
 // FOR STRING TRANSLATIONS
@@ -127,6 +127,10 @@ function sgs_emails_settings_probability_callback() {
 		array(
 			'l' => __('66%','sgs-emails'),
 			'v' => '66'
+		),
+		array(
+			'l' => __('75%','sgs-emails'),
+			'v' => '75'
 		),
 		array(
 			'l' => __('100%','sgs-emails'),
@@ -411,20 +415,29 @@ function sgs_emails_compose_and_send($email_address) {
 function sgs_emails_if_send() {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$prob = $settings['sgs_emails_settings_probability'];
-
 	switch ($prob) {
-	case "0":
+	case 0:
 		$n = array(0);
-	case "25":
+		break;
+	case 25:
 		$n = array(0,0,0,1);
-	case "33":
+		break;
+	case 33:
 		$n = array(0,0,1);
-	case "50":
+		break;
+	case 50:
 		$n = array(0,1);
-	case "66":
+		break;
+	case 66:
+		$n = array(0,1,1);
+		break;
+	case 75:
 		$n = array(0,1,1,1);
-	case "100":
+		break;
+
+	case 100:
 		$n = array(1);
+		break;
 	}
 	$send = $n[array_rand($n)];
 	return $send;
