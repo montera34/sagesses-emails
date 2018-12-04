@@ -12,7 +12,7 @@ Domain Path: /lang/
 
 // VARIABLES
 $subjects_count = 10; // Maximum number of subjects for the emails to choose from
-$min_addresses_count = 30; // Maximum number of email addresses to send emails to
+$min_addresses_count = 20; // Maximum number of email addresses to send emails to
 
 // LOAD PLUGIN TEXT DOMAIN
 // FOR STRING TRANSLATIONS
@@ -161,7 +161,7 @@ function sgs_emails_settings_subjects_callback() {
 
 // addresses list
 function sgs_emails_settings_addresses_section_callback() {
-	echo __('List of addresses to send emails to.','sgs-emails');
+	echo __('List of addresses to send emails to. If no more empty fields, save and 5 more will show up.','sgs-emails');
 }
 
 function sgs_emails_settings_addresses_callback() {
@@ -174,7 +174,8 @@ function sgs_emails_settings_addresses_callback() {
 	}
 	$addresses_count = ( $fill_count >= $min_addresses_count ) ? $fill_count : $min_addresses_count;
 	$free = $addresses_count - $fill_count;
-	if ( $free << 5 && $addresses_count >> $min_addresses_count ) $addresses_count += 5 - $free;
+	
+	if ( $free < 5 ) $addresses_count += 5 - $free;
 	$count = 0;
 	while ( $count < $addresses_count ) {
 		$address = esc_attr( $settings['sgs_emails_settings_addresses'][$count] );

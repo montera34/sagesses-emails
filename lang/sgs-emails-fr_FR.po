@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sgs_emails\n"
-"POT-Creation-Date: 2018-05-19 13:27+0200\n"
-"PO-Revision-Date: 2018-05-19 13:27+0200\n"
+"POT-Creation-Date: 2018-12-04 10:41+0100\n"
+"PO-Revision-Date: 2018-12-04 10:44+0100\n"
 "Last-Translator: Alfonso Sánchez Uzábal <skotperez@voragine.net>\n"
 "Language-Team: Montera34\n"
 "Language: fr_FR\n"
@@ -17,11 +17,11 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: languages\n"
 "X-Poedit-SearchPathExcluded-1: .git\n"
 
-#: email-template.php:128
+#: email-template.php:119
 msgid "You are invited to do this right now:"
 msgstr "Vous êtes invité(e) à appliquer à l’instant:"
 
-#: email-template.php:150
+#: email-template.php:141
 msgid ""
 "You can unsuscribe from this newsletter when you want: just send an email to "
 "ccilica@gmail.com"
@@ -118,10 +118,14 @@ msgid "66%"
 msgstr "66%"
 
 #: sagesses-envoi.php:132
+msgid "75%"
+msgstr "75%"
+
+#: sagesses-envoi.php:136
 msgid "100%"
 msgstr "100%"
 
-#: sagesses-envoi.php:144
+#: sagesses-envoi.php:148
 msgid ""
 "List of subjects for emails. When an email is sent, its subject will be "
 "chosen randomly from this list."
@@ -129,18 +133,25 @@ msgstr ""
 "Liste d'objets pour les emails. Quand un email est envoyé, l'objet sera "
 "choisi d'une façon aléatoire."
 
-#: sagesses-envoi.php:160
-msgid "List of addresses to send emails to."
-msgstr "Liste de destinataires."
+#: sagesses-envoi.php:164
+msgid ""
+"List of addresses to send emails to. If no more empty fields, save and 5 "
+"more will show up."
+msgstr ""
+"Liste de destinataires. Si il n'y a plus des champs libres, enregistrez et 5 "
+"champs apparaîtront."
 
-#: sagesses-envoi.php:176
+#: sagesses-envoi.php:189
 msgid "Headers for outgoing emails sent by this plugin."
 msgstr "En-têtes pour les email envoyés par ce module."
 
-#: sagesses-envoi.php:206
+#: sagesses-envoi.php:219
 msgid "Sagesses send emails tool"
 msgstr "Outil de Sagesses pour l'envoi des emails"
 
-#: sagesses-envoi.php:270
+#: sagesses-envoi.php:283
 msgid "Image"
 msgstr "Image"
+
+#~ msgid "List of addresses to send emails to."
+#~ msgstr "Liste de destinataires."
