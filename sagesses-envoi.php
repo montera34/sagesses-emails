@@ -55,9 +55,16 @@ function sgs_emails_register_settings() {
 	add_settings_section( 'sgs_emails_settings_ptype_section', __('Post type','sgs-emails'), 'sgs_emails_settings_ptype_section_callback', 'sagesses_emails' );
 	add_settings_field( 'sgs_emails_settings_ptype', __('Post type for email content','sgs-emails'), 'sgs_emails_settings_ptype_callback', 'sagesses_emails', 'sgs_emails_settings_ptype_section' );
 
+	// deliveries per day
+	add_settings_section( 'sgs_emails_settings_deliveries_section', __('Deliveries','sgs-emails'), 'sgs_emails_settings_deliveries_section_callback', 'sagesses_emails' );
+	add_settings_field( 'sgs_emails_settings_deliveries_per_day', __('Deliveries per day','sgs-emails'), 'sgs_emails_settings_deliveries_per_day_callback', 'sagesses_emails', 'sgs_emails_settings_deliveries_section' );
+
 	// send probability
 	add_settings_section( 'sgs_emails_settings_probability_section', __('Send probability','sgs-emails'), 'sgs_emails_settings_probability_section_callback', 'sagesses_emails' );
-	add_settings_field( 'sgs_emails_settings_probability', __('Probability','sgs-emails'), 'sgs_emails_settings_probability_callback', 'sagesses_emails', 'sgs_emails_settings_probability_section' );
+	add_settings_field( 'sgs_emails_settings_probability', __('Probability 1','sgs-emails'), 'sgs_emails_settings_probability_callback', 'sagesses_emails', 'sgs_emails_settings_probability_section' );
+	add_settings_field( 'sgs_emails_settings_probability_2', __('Probability 2','sgs-emails'), 'sgs_emails_settings_probability_2_callback', 'sagesses_emails', 'sgs_emails_settings_probability_section' );
+	add_settings_field( 'sgs_emails_settings_probability_3', __('Probability 3','sgs-emails'), 'sgs_emails_settings_probability_3_callback', 'sagesses_emails', 'sgs_emails_settings_probability_section' );
+	add_settings_field( 'sgs_emails_settings_probability_4', __('Probability 4','sgs-emails'), 'sgs_emails_settings_probability_4_callback', 'sagesses_emails', 'sgs_emails_settings_probability_section' );
 
 	// subjects list settings
 	add_settings_section( 'sgs_emails_settings_subjects_section', __('Subjects','sgs-emails'), 'sgs_emails_settings_subjects_section_callback', 'sagesses_emails' );
@@ -98,49 +105,156 @@ function sgs_emails_settings_ptype_callback() {
 	echo "<select name='sgs_emails_settings[sgs_emails_settings_ptype]'>".$options."</select>";
 }
 
-// send probability
-function sgs_emails_settings_probability_section_callback() {
-	echo __('Choose the probability to send emails at each send time.','sgs-emails');
+// deliveries per day
+function sgs_emails_settings_deliveries_section_callback() {
+	echo __('Deliveries per day. This setting creates the cron jobs to trigger the each delibery.','sgs-emails');
 }
 
-function sgs_emails_settings_probability_callback() {
+function sgs_emails_settings_deliveries_per_day_callback() {
 	$settings = (array) get_option( 'sgs_emails_settings' );
-	$prob = esc_attr( $settings['sgs_emails_settings_probability'] );
-	$options = '';
+	$prob = esc_attr( $settings['sgs_emails_settings_deliveries_per_day'] );
 	$probs = array(
 		array(
-			'l' => __('0% - Sends are halted','sgs-emails'),
+			'l' => __('0','sgs-emails'),
 			'v' => '0'
 		),
 		array(
-			'l' => __('25%','sgs-emails'),
-			'v' => '25'
+			'l' => __('1','sgs-emails'),
+			'v' => '1'
 		),
 		array(
-			'l' => __('33%','sgs-emails'),
-			'v' => '33'
+			'l' => __('2','sgs-emails'),
+			'v' => '2'
 		),
 		array(
-			'l' => __('50%','sgs-emails'),
-			'v' => '50'
+			'l' => __('3','sgs-emails'),
+			'v' => '3'
 		),
 		array(
-			'l' => __('66%','sgs-emails'),
-			'v' => '66'
+			'l' => __('4','sgs-emails'),
+			'v' => '4'
 		),
 		array(
-			'l' => __('75%','sgs-emails'),
-			'v' => '75'
-		),
-		array(
-			'l' => __('100%','sgs-emails'),
-			'v' => '100'
+			'l' => __('5','sgs-emails'),
+			'v' => '5'
 		)
 	);
 	foreach ( $probs as $p ) {
 		$options .= ( $p['v'] == $prob ) ? '<option value="'.$p['v'].'" selected>'.$p['l'].'</option>' : '<option value="'.$p['v'].'">'.$p['l'].'</option>';
 	}
+	echo "<select name='sgs_emails_settings[sgs_emails_settings_deliveries_per_day]'>".$options."</select>";
+}
+
+// send probability
+function sgs_emails_settings_probability_section_callback() {
+	echo __('Choose the probability to send emails at each send time.','sgs-emails');
+}
+
+$probs = array(
+	array(
+		'l' => __('0% - Sends are halted','sgs-emails'),
+		'v' => '0'
+	),
+	array(
+		'l' => __('8%','sgs-emails'),
+		'v' => '8'
+	),
+	array(
+		'l' => __('10%','sgs-emails'),
+		'v' => '10'
+	),
+	array(
+		'l' => __('11%','sgs-emails'),
+		'v' => '11'
+	),
+	array(
+		'l' => __('15%','sgs-emails'),
+		'v' => '15'
+	),
+	array(
+		'l' => __('17%','sgs-emails'),
+		'v' => '17'
+	),
+	array(
+		'l' => __('20%','sgs-emails'),
+		'v' => '20'
+	),
+	array(
+		'l' => __('25%','sgs-emails'),
+		'v' => '25'
+	),
+	array(
+		'l' => __('30%','sgs-emails'),
+		'v' => '30'
+	),
+	array(
+		'l' => __('33%','sgs-emails'),
+		'v' => '33'
+	),
+	array(
+		'l' => __('40%','sgs-emails'),
+		'v' => '40'
+	),
+	array(
+		'l' => __('50%','sgs-emails'),
+		'v' => '50'
+	),
+	array(
+		'l' => __('66%','sgs-emails'),
+		'v' => '66'
+	),
+	array(
+		'l' => __('75%','sgs-emails'),
+		'v' => '75'
+	),
+	array(
+		'l' => __('100%','sgs-emails'),
+		'v' => '100'
+	)
+);
+
+function sgs_emails_settings_probability_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$prob = esc_attr( $settings['sgs_emails_settings_probability'] );
+	global $probs;
+	$options = '';
+	foreach ( $probs as $p ) {
+		$options .= ( $p['v'] == $prob ) ? '<option value="'.$p['v'].'" selected>'.$p['l'].'</option>' : '<option value="'.$p['v'].'">'.$p['l'].'</option>';
+	}
 	echo "<select name='sgs_emails_settings[sgs_emails_settings_probability]'>".$options."</select>";
+}
+
+function sgs_emails_settings_probability_2_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$prob = esc_attr( $settings['sgs_emails_settings_probability_2'] );
+	global $probs;
+	$options = '';
+	foreach ( $probs as $p ) {
+		$options .= ( $p['v'] == $prob ) ? '<option value="'.$p['v'].'" selected>'.$p['l'].'</option>' : '<option value="'.$p['v'].'">'.$p['l'].'</option>';
+	}
+	echo "<select name='sgs_emails_settings[sgs_emails_settings_probability_2]'>".$options."</select>";
+}
+
+function sgs_emails_settings_probability_3_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$prob = esc_attr( $settings['sgs_emails_settings_probability_3'] );
+	global $probs;
+	$options = '';
+	foreach ( $probs as $p ) {
+		$options .= ( $p['v'] == $prob ) ? '<option value="'.$p['v'].'" selected>'.$p['l'].'</option>' : '<option value="'.$p['v'].'">'.$p['l'].'</option>';
+	}
+	echo "<select name='sgs_emails_settings[sgs_emails_settings_probability_3]'>".$options."</select>";
+}
+
+function sgs_emails_settings_probability_4_callback() {
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$prob = esc_attr( $settings['sgs_emails_settings_probability_4'] );
+	global $probs;
+	$options = '';
+	foreach ( $probs as $p ) {
+		$options .= ( $p['v'] == $prob ) ? '<option value="'.$p['v'].'" selected>'.$p['l'].'</option>' : '<option value="'.$p['v'].'">'.$p['l'].'</option>';
+	}
+	echo "<select name='sgs_emails_settings[sgs_emails_settings_probability_4]'>".$options."</select>";
 }
 
 // subjects list

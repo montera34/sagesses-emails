@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sgs_emails\n"
-"POT-Creation-Date: 2018-12-04 10:41+0100\n"
-"PO-Revision-Date: 2018-12-04 10:44+0100\n"
+"POT-Creation-Date: 2018-12-17 12:38+0100\n"
+"PO-Revision-Date: 2018-12-17 12:41+0100\n"
 "Last-Translator: Alfonso Sánchez Uzábal <skotperez@voragine.net>\n"
 "Language-Team: Montera34\n"
 "Language: fr_FR\n"
@@ -46,86 +46,170 @@ msgid "Post type for email content"
 msgstr "Type de contenu pour les emails"
 
 #: sagesses-envoi.php:59
+msgid "Deliveries"
+msgstr "Livraisons"
+
+#: sagesses-envoi.php:60
+msgid "Deliveries per day"
+msgstr "Livraisons par jour"
+
+#: sagesses-envoi.php:63
 msgid "Send probability"
 msgstr "Probabilité d'envoi"
 
-#: sagesses-envoi.php:60
-msgid "Probability"
-msgstr "Probabilité"
+#: sagesses-envoi.php:64
+msgid "Probability 1"
+msgstr "Probabilité 1"
 
-#: sagesses-envoi.php:63
+#: sagesses-envoi.php:65
+msgid "Probability 2"
+msgstr "Probabilité 2"
+
+#: sagesses-envoi.php:66
+msgid "Probability 3"
+msgstr "Probabilité 3"
+
+#: sagesses-envoi.php:67
+msgid "Probability 4"
+msgstr "Probabilité 4"
+
+#: sagesses-envoi.php:70
 msgid "Subjects"
 msgstr "Objets"
 
-#: sagesses-envoi.php:64
+#: sagesses-envoi.php:71
 msgid "List of subjects"
 msgstr "Liste d'objets"
 
-#: sagesses-envoi.php:67
+#: sagesses-envoi.php:74
 msgid "Addresses"
 msgstr "Adresses"
 
-#: sagesses-envoi.php:68
+#: sagesses-envoi.php:75
 msgid "List of addresses"
 msgstr "Liste d'adresses"
 
-#: sagesses-envoi.php:71
+#: sagesses-envoi.php:78
 msgid "Email headers"
 msgstr "En-têtes des emails"
 
-#: sagesses-envoi.php:72
+#: sagesses-envoi.php:79
 msgid "From field (email address)"
 msgstr "From (émail adresse)"
 
-#: sagesses-envoi.php:73
+#: sagesses-envoi.php:80
 msgid "From field (name)"
 msgstr "From (nom)"
 
-#: sagesses-envoi.php:74
+#: sagesses-envoi.php:81
 msgid "Reply-to field (email address)"
 msgstr "Reply-to (émail adresse)"
 
-#: sagesses-envoi.php:75
+#: sagesses-envoi.php:82
 msgid "Reply-to field (name)"
 msgstr "Reply-to (nom)"
 
-#: sagesses-envoi.php:83
+#: sagesses-envoi.php:90
 msgid "Choose a post type to feed the emails with content."
 msgstr "Choisissez un type de contenu pour montrer de contenu dans les emails."
 
-#: sagesses-envoi.php:103
+#: sagesses-envoi.php:110
+msgid ""
+"Deliveries per day. This setting creates the cron jobs to trigger the each "
+"delibery."
+msgstr ""
+"Livraisons par jour. Cet réglage modifie les cron jobs pour actionner chaque "
+"livraison."
+
+#: sagesses-envoi.php:118
+msgid "0"
+msgstr ""
+
+#: sagesses-envoi.php:122
+msgid "1"
+msgstr ""
+
+#: sagesses-envoi.php:126
+msgid "2"
+msgstr ""
+
+#: sagesses-envoi.php:130
+msgid "3"
+msgstr ""
+
+#: sagesses-envoi.php:134
+msgid "4"
+msgstr ""
+
+#: sagesses-envoi.php:138
+msgid "5"
+msgstr ""
+
+#: sagesses-envoi.php:150
 msgid "Choose the probability to send emails at each send time."
 msgstr "Choisir la probabilité d'envoi d'émails à chaque envoi."
 
-#: sagesses-envoi.php:112
+#: sagesses-envoi.php:155
 msgid "0% - Sends are halted"
 msgstr "0% - Les envois sont arrêtés"
 
-#: sagesses-envoi.php:116
+#: sagesses-envoi.php:159
+msgid "8%"
+msgstr ""
+
+#: sagesses-envoi.php:163
+msgid "10%"
+msgstr ""
+
+#: sagesses-envoi.php:167
+msgid "11%"
+msgstr ""
+
+#: sagesses-envoi.php:171
+msgid "15%"
+msgstr ""
+
+#: sagesses-envoi.php:175
+msgid "17%"
+msgstr ""
+
+#: sagesses-envoi.php:179
+msgid "20%"
+msgstr ""
+
+#: sagesses-envoi.php:183
 msgid "25%"
 msgstr "25%"
 
-#: sagesses-envoi.php:120
+#: sagesses-envoi.php:187
+msgid "30%"
+msgstr ""
+
+#: sagesses-envoi.php:191
 msgid "33%"
 msgstr "33%"
 
-#: sagesses-envoi.php:124
+#: sagesses-envoi.php:195
+msgid "40%"
+msgstr ""
+
+#: sagesses-envoi.php:199
 msgid "50%"
 msgstr "50%"
 
-#: sagesses-envoi.php:128
+#: sagesses-envoi.php:203
 msgid "66%"
 msgstr "66%"
 
-#: sagesses-envoi.php:132
+#: sagesses-envoi.php:207
 msgid "75%"
 msgstr "75%"
 
-#: sagesses-envoi.php:136
+#: sagesses-envoi.php:211
 msgid "100%"
 msgstr "100%"
 
-#: sagesses-envoi.php:148
+#: sagesses-envoi.php:262
 msgid ""
 "List of subjects for emails. When an email is sent, its subject will be "
 "chosen randomly from this list."
@@ -133,7 +217,7 @@ msgstr ""
 "Liste d'objets pour les emails. Quand un email est envoyé, l'objet sera "
 "choisi d'une façon aléatoire."
 
-#: sagesses-envoi.php:164
+#: sagesses-envoi.php:278
 msgid ""
 "List of addresses to send emails to. If no more empty fields, save and 5 "
 "more will show up."
@@ -141,17 +225,20 @@ msgstr ""
 "Liste de destinataires. Si il n'y a plus des champs libres, enregistrez et 5 "
 "champs apparaîtront."
 
-#: sagesses-envoi.php:189
+#: sagesses-envoi.php:303
 msgid "Headers for outgoing emails sent by this plugin."
 msgstr "En-têtes pour les email envoyés par ce module."
 
-#: sagesses-envoi.php:219
+#: sagesses-envoi.php:333
 msgid "Sagesses send emails tool"
 msgstr "Outil de Sagesses pour l'envoi des emails"
 
-#: sagesses-envoi.php:283
+#: sagesses-envoi.php:397
 msgid "Image"
 msgstr "Image"
+
+#~ msgid "Probability"
+#~ msgstr "Probabilité"
 
 #~ msgid "List of addresses to send emails to."
 #~ msgstr "Liste de destinataires."
