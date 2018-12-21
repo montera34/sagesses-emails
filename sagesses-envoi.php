@@ -340,10 +340,6 @@ function sgs_emails_dashboard_page_output() {
 		</form>
 	</div>
 <?php
-	sgs_emails_action_per_address();
-	//echo sgs_emails_if_send('voraginebramante@gmail.com',array(1,2,3,4),array(1,2,3));
-	//sgs_emails_choose_image('voraginebramante@gmail.com',array(1452,1238,1236,1196));
-
 }
 
 // end PLUGIN PAGE IN DASHBOARD
