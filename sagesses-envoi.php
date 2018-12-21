@@ -328,8 +328,8 @@ function sgs_emails_settings_headers_replyto_name_callback() {
 }
 
 // GENERATE OUTPUT
-function sgs_emails_dashboard_page_output() { ?>
-	<?php sgs_emails_set_wpcron();
+function sgs_emails_dashboard_page_output() { 
+	sgs_emails_set_wpcron();
 ?>
 	<div class="wrap">
 		<h2><?php _e('Sagesses send emails tool','sgs-emails'); ?></h2>
@@ -340,6 +340,10 @@ function sgs_emails_dashboard_page_output() { ?>
 		</form>
 	</div>
 <?php
+	sgs_emails_action_per_address();
+	//echo sgs_emails_if_send('voraginebramante@gmail.com',array(1,2,3,4),array(1,2,3));
+	//sgs_emails_choose_image('voraginebramante@gmail.com',array(1452,1238,1236,1196));
+
 }
 
 // end PLUGIN PAGE IN DASHBOARD
@@ -368,7 +372,7 @@ function sgs_emails_choose_subject() {
 }
 
 // CHOOSE CONTENT FOR EMAIL
-function sgs_emails_choose_image($email_address) {
+function sgs_emails_choose_image($email_address,$user,$contents_all,$exclude_ids) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$pt = $settings['sgs_emails_settings_ptype'];
 
@@ -381,7 +385,8 @@ function sgs_emails_choose_image($email_address) {
 				'showposts' => 1,
 				'orderby' => 'rand',
 				'post_parent' => 0,
-				'post_status' => 'publish'
+				'post_status' => 'publish',
+				'post__not_in' => $exclude_ids
 			);
 		}
 		else {
@@ -391,8 +396,8 @@ function sgs_emails_choose_image($email_address) {
 				'post_status' => 'publish'
 			);
 		}
-
 		$contents = get_posts($args);
+
 		$content = $contents[0];
 		if ( has_post_thumbnail($content->ID) ) {
 			$image['id'] = get_post_thumbnail_id($content->ID);
@@ -403,6 +408,7 @@ function sgs_emails_choose_image($email_address) {
 			$image_dir = trailingslashit($upload_dir['baseurl']);
 			$image_dir_path = trailingslashit($upload_dir['basedir']);
 			$image_email = $image_data['sizes']['sgs-emails'];
+
 			if ( is_array($image_email) && count($image_email) == 4 ) {
 				$image['url'] =  $image_dir . $image_subdir . $image_email['file'];
 				$image['path'] = $image_dir_path . $image_subdir . $image_email['file'];
@@ -410,7 +416,8 @@ function sgs_emails_choose_image($email_address) {
 				$image['height'] = $image_email['height'];
 				$image['mime-type'] = $image_email['mime-type'];
 				$image['filename'] = $image_email['file'];
-			} else {
+			}
+			else {
 				$image['url'] =  $image_dir . $image_data['file'];
 				$image['path'] = $image_dir_path . $image_data['file'];
 				$image['width'] = $image_data['width'];
@@ -447,124 +454,81 @@ function sgs_emails_choose_image($email_address) {
 			sgs_emails_current_delete($email_address);
 		}
 	}
+
+	add_user_meta( $user->ID, '_sgs_emails_log', $content->ID );
+
+	// check how many images has already received the user
+	$contents_check = $contents_all;
+	$u_log_check = get_user_meta($user->ID,'_sgs_emails_log');
+	if ( !empty($contents_check) && count($contents_check) == count($u_log_check) )
+		add_user_meta( $user->ID, '_sgs_emails_ended', 1, true );
+
 	return $image;
 }
 
 // COMPOSE AND SEND EMAIL
-function sgs_emails_compose_and_send($email_address) {
+function sgs_emails_compose_and_send($email_address,$user,$contents_all,$exclude_ids) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$from = $settings['sgs_emails_settings_from'];
 	$from_name = $settings['sgs_emails_settings_from_name'];
 	$replyto = $settings['sgs_emails_settings_replyto'];
 	$replyto_name = $settings['sgs_emails_settings_replyto_name'];
 
-//	$boundary = sgs_emails_random_string();
-//	$boundary_alt = sgs_emails_random_string();
-//	$boundary_rel = sgs_emails_random_string();
-//	$newline  = "\r\n";
-
 	$to = $email_address;
 	$subject = sgs_emails_choose_subject();
-	//add_filter( 'wp_mail_from', 'sgs_mail_from' );
-	//add_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
-	//$headers[] = 'Reply-To: '.$replyto_name.' <'.$replyto.'>' . "\r\n";
-	// To send HTML mail, the Content-type header must be set
-//	$headers[]  = 'MIME-Version: 1.0' . "\r\n";
-//	$headers[] = 'Content-type: text/html; charset=UTF-8' . "\r\n";
-//	$headers[] = 'Content-type: multipart/related' . "\r\n";
-//	$headers[] = 'boundary="'.$boundary_alt.'"' . "\r\n";
 
-	$image = sgs_emails_choose_image($to);
-//	$img_b64 = base64_encode(file_get_contents($image['url']));
-	//$file = $image['url']; //phpmailer will load this file
+	$image = sgs_emails_choose_image($to,$user,$contents_all,$exclude_ids);
+	if ( $image == false )
+		return;
+
 	$related_file = $image['path'];
-	$related_cid = sgs_emails_random_string();; //will map it to this UID
+	$related_cid = sgs_emails_random_string(); //will map it to this UID
 	$related_name = $image['filename']; //this will be the file name for the attachment
 
 	include "email-template.php";
 	$body = $email_template;
-	// $message = "Testing";
-//global $phpmailer;
+
 	$sgs_emails_phpmailer = function(&$phpmailer)use($related_file,$related_cid,$related_name,$from,$from_name,$replyto,$replyto_name){
 
 	$phpmailer->SMTPKeepAlive = true;
 	$phpmailer->IsHTML(true);
-//	$headers = 'Content-type: multipart/alternative\n';
-//	$headers .= 'MIME-Version: 1.0\n';
-//	$phpmailer->AddCustomHeader($headers);
 	$phpmailer->AddEmbeddedImage($related_file, $related_cid, $related_name);
 	$phpmailer->From = $from;
 	$phpmailer->FromName = $from_name;
 	$phpmailer->AddReplyTo($replyto, $replyto_name);
 	};
+
 	add_action( 'phpmailer_init',$sgs_emails_phpmailer);
 	$sent = wp_mail( $to, $subject, $body);
 	remove_action('phpmailer_init', $sgs_emails_phpmailer);
-	//remove_filter( 'wp_mail_from', 'sgs_wp_mail_from' );
-	//remove_filter( 'wp_mail_from_name', 'sgs_mail_from_name' );
-//$body= rtrim(chunk_split(base64_encode($message)));
-
-
-//	$headers =
-//	'Content-Type: multipart/related; boundary="'.$boundary_rel.'"'.$newline.
-//	'MIME-Version: 1.0'.$newline.
-//	'From: '.$from_name.' <'.$from.'>'.$newline.
-//	'Reply-To: '.$replyto_name.' <'.$replyto.'>'.$newline.$newline
-
-//	"Content-Type: multipart/related; boundary=\"$boundary_rel\"$newline".
-//	"MIME-Version: 1.0$newline".
-//	"From: $from_name <$from>$newline".
-//	"Reply-To: $replyto_name <$replyto>$newline$newline"
-       
-       //          "Content-Type: multipart/alternative;".
-  //         "$boundary$newline".
-//	"Content-Type: text/html; charset=UTF-8$newline".
-////	"Content-Transfer-Encoding: base64$newline$newline";
-//	"Content-Transfer-Encoding: 7bit$newline$newline";
-	;
-
-//$sent = mail($to,$subject,$body,$headers);
-//$sent = mail($to,$subject,$body);
-//mail($to,$subject,"the content");
-//echo 'HAR!';
-//	require_once ABSPATH . WPINC . '/class-phpmailer.php';
-//	global $phpmailer;
-//	$mail = new PHPMailer();
-//	return $image['path'];
 	return $sent;
-	//return $img_b64;
-
 }
 
 // DETERMINE WHEN TO SEND EMAIL
-function sgs_emails_if_send() {
+function sgs_emails_if_send($address,$contents_all,$log) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$prob = $settings['sgs_emails_settings_probability'];
-	switch ($prob) {
-	case 0:
-		$n = array(0);
-		break;
-	case 25:
-		$n = array(0,0,0,1);
-		break;
-	case 33:
-		$n = array(0,0,1);
-		break;
-	case 50:
-		$n = array(0,1);
-		break;
-	case 66:
-		$n = array(0,1,1);
-		break;
-	case 75:
-		$n = array(0,1,1,1);
-		break;
-
-	case 100:
-		$n = array(1);
-		break;
+	$count_contents = count($contents_all);
+	if ( $count_contents > 0 ) {
+		$count_log = count($log);
+		$d = ($count_log / $count_contents);
+		if ( $d < 0.5 && $d >= 0.25 )
+			$prob = $settings['sgs_emails_settings_probability_2'];
+		elseif ( $d < 0.75 && $d >= 0.5 )
+			$prob = $settings['sgs_emails_settings_probability_3'];
+		elseif ( $d < 1 && $d >= 0.75 )
+			$prob = $settings['sgs_emails_settings_probability_4'];
+	} else { return 0; }
+		
+	$n = array();
+	for ( $i = 0; $i < 100; $i++ ) {
+		$n[] = ( $i < $prob ) ? 1 : 0; 
 	}
+
 	$send = $n[array_rand($n)];
+echo $send;
+echo '<br>';
+echo $prob;
 	return $send;
 }
 
@@ -595,12 +559,36 @@ function sgs_emails_action_per_address() {
 		return;
 
 	$settings = (array) get_option( 'sgs_emails_settings' );
+	$pt = $settings['sgs_emails_settings_ptype'];
 	$addresses = $settings['sgs_emails_settings_addresses'];
+	$args = array(
+		'post_type' => $pt,
+		'showposts' => -1,
+		'post_status' => 'publish'
+	);
+	$contents = get_posts($args);
 	foreach ( $addresses as $a ) {
-		if ( sgs_emails_if_send() !== 1 )
+		// get current user by email
+		$u = get_user_by('email',$a);
+		if ( $u == false ) // if user does not exist
 			continue;
 
-		$sent = sgs_emails_compose_and_send($a);
+		$u_ended = get_user_meta($u->ID,'_sgs_emails_ended');
+		if ( $u_ended[0] == 1 )
+			continue;
+
+		$u_log = get_user_meta($u->ID,'_sgs_emails_log');
+		if ( ! empty($u_log) ) {
+			foreach ( $u_log as $l ) {
+				$exclude_ids[] = $l['ID'];
+			}
+		}
+		else { $exclude_ids = array(); }
+
+		if ( sgs_emails_if_send($a,$contents,$u_log) !== 1 )
+			continue;
+
+		$sent = sgs_emails_compose_and_send($a,$u,$contents,$exclude_ids);
 	}
 }
 
@@ -665,13 +653,13 @@ function sgs_emails_current_delete($address) {
 
 ////
 // CRON TASKS
-	$times = array(
-		strtotime('tomorrow 09:30'),
-		strtotime('tomorrow 10:30'),
-		strtotime('tomorrow 14:00'),
-		strtotime('tomorrow 14:30'),
-		strtotime('tomorrow 15:30')
-	);
+$times = array(
+	strtotime('tomorrow 09:30'),
+	strtotime('tomorrow 10:30'),
+	strtotime('tomorrow 14:00'),
+	strtotime('tomorrow 14:30'),
+	strtotime('tomorrow 15:30')
+);
 
 register_activation_hook( __FILE__, 'sgs_emails_set_wpcron' );
 function sgs_emails_set_wpcron() {
@@ -711,7 +699,6 @@ function sgs_emails_unset_wpcron() {
 		$job = 'sgs_emails_set_cron_'.$i;
 		$timestamp = wp_next_scheduled( $job );
 		if( $timestamp == false ) {
-			//wp_unschedule_event( $times[$i], 'sgs_emails_set_cron_'.$i );
 			wp_clear_scheduled_hook( $job );
 			//remove_action( $job, 'sgs_emails_action_per_address');
 		}
