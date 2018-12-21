@@ -330,6 +330,7 @@ function sgs_emails_settings_headers_replyto_name_callback() {
 // GENERATE OUTPUT
 function sgs_emails_dashboard_page_output() { 
 	sgs_emails_set_wpcron();
+	sgs_emails_sort_addresses();
 ?>
 	<div class="wrap">
 		<h2><?php _e('Sagesses send emails tool','sgs-emails'); ?></h2>
@@ -344,6 +345,20 @@ function sgs_emails_dashboard_page_output() {
 
 // end PLUGIN PAGE IN DASHBOARD
 ////
+
+
+// SORT EMAIL ADDRESSES
+function sgs_emails_sort_addresses() {
+	//function _remove_empty_internal($value) { return !empty($value) || $value === 0; }
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	$addresses = $settings['sgs_emails_settings_addresses'];
+	$sorted = array_map('trim', $addresses);
+	//array_filter($sorted, '_remove_empty_internal');
+	rsort($sorted);
+	$settings['sgs_emails_settings_addresses'] = $sorted;
+	update_option('sgs_emails_settings',$settings);
+	return;
+}
 
 // GENERATE RANDOM STRING
 function sgs_emails_random_string($length = 16) {
