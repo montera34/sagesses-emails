@@ -332,8 +332,6 @@ function sgs_emails_settings_headers_replyto_name_callback() {
 function sgs_emails_dashboard_page_output() { 
 	sgs_emails_set_wpcron();
 	sgs_emails_sort_addresses();
-	
-	sgs_emails_action_per_address();
 ?>
 	<div class="wrap">
 		<h2><?php _e('Sagesses send emails tool','sgs-emails'); ?></h2>
