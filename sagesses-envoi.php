@@ -139,6 +139,7 @@ function sgs_emails_settings_deliveries_per_day_callback() {
 			'v' => '5'
 		)
 	);
+	$options = '';
 	foreach ( $probs as $p ) {
 		$options .= ( $p['v'] == $prob ) ? '<option value="'.$p['v'].'" selected>'.$p['l'].'</option>' : '<option value="'.$p['v'].'">'.$p['l'].'</option>';
 	}
@@ -331,6 +332,8 @@ function sgs_emails_settings_headers_replyto_name_callback() {
 function sgs_emails_dashboard_page_output() { 
 	sgs_emails_set_wpcron();
 	sgs_emails_sort_addresses();
+	
+	sgs_emails_action_per_address();
 ?>
 	<div class="wrap">
 		<h2><?php _e('Sagesses send emails tool','sgs-emails'); ?></h2>
@@ -512,6 +515,7 @@ function sgs_emails_compose_and_send($email_address,$user,$contents_all,$exclude
 	add_action( 'phpmailer_init',$sgs_emails_phpmailer);
 	$sent = wp_mail( $to, $subject, $body);
 	remove_action('phpmailer_init', $sgs_emails_phpmailer);
+
 	return $sent;
 }
 
@@ -537,9 +541,6 @@ function sgs_emails_if_send($address,$contents_all,$log) {
 	}
 
 	$send = $n[array_rand($n)];
-echo $send;
-echo '<br>';
-echo $prob;
 	return $send;
 }
 
@@ -560,6 +561,7 @@ function sgs_mail_from_name( $original_email_from ) {
 
 // ACTION PER ADDRESS
 function sgs_emails_action_per_address() {
+
 	$dw = date('w');
 	$ch = date('dm');
 	// if saturday or sunday, do nothing
@@ -598,9 +600,9 @@ function sgs_emails_action_per_address() {
 
 		if ( sgs_emails_if_send($a,$contents,$u_log) !== 1 )
 			continue;
-
 		$sent = sgs_emails_compose_and_send($a,$u,$contents,$exclude_ids);
 	}
+	return;
 }
 
 
@@ -676,8 +678,10 @@ register_activation_hook( __FILE__, 'sgs_emails_set_wpcron' );
 function sgs_emails_set_wpcron() {
 	global $times;
 	$settings = (array) get_option( 'sgs_emails_settings' );
-	$dpd = esc_attr( $settings['sgs_emails_settings_deliveries_per_day'] );
-	if ( $dpd == '' ) return;
+	if ( array_key_exists('sgs_emails_settings_deliveries_per_day',$settings) )
+		$dpd = esc_attr( $settings['sgs_emails_settings_deliveries_per_day'] );
+	else
+		return;
 
 	for ( $i = 0; $i < 5;$i++ ) {
 		$job = 'sgs_emails_set_cron_'.$i;
@@ -691,6 +695,7 @@ function sgs_emails_set_wpcron() {
 			wp_clear_scheduled_hook( $job );
 		}
 	}
+	return;
 }
 
 //Hook our function, sgs_emails_action_per_address, into the action sgs_emails_scheduled_send
@@ -704,7 +709,11 @@ add_action( 'sgs_emails_set_cron_4', 'sgs_emails_action_per_address');
 register_deactivation_hook( __FILE__, 'sgs_emails_unset_wpcron' );
 function sgs_emails_unset_wpcron() {
 	global $times;
-	$dpd = '5';
+	$settings = (array) get_option( 'sgs_emails_settings' );
+	if ( array_key_exists('sgs_emails_settings_deliveries_per_day',$settings) )
+		$dpd = esc_attr( $settings['sgs_emails_settings_deliveries_per_day'] );
+	else
+		return;
 
 	for ( $i = 0;$i < $dpd;$i++ ) {
 		$job = 'sgs_emails_set_cron_'.$i;
