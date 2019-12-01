@@ -1,5 +1,8 @@
 # Sagesses Emails
 
+This repository has been moved. To get the last version go to https://code.montera34.com/sagesses/sagesses-envoi
+
+
 Version: 0.1
 
 ## Summary
