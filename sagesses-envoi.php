@@ -293,7 +293,7 @@ function sgs_emails_settings_addresses_callback() {
 	if ( $free < 5 ) $addresses_count += 5 - $free;
 	$count = 0;
 	while ( $count < $addresses_count ) {
-		$address = esc_attr( $settings['sgs_emails_settings_addresses'][$count] );
+		$address = ( array_key_exists($count,$settings['sgs_emails_settings_addresses'])) ? esc_attr( $settings['sgs_emails_settings_addresses'][$count] ) : '';
 		echo "<input type='text' name='sgs_emails_settings[sgs_emails_settings_addresses][".$count."]' value='$address' />";
 		$count++;
 	}
@@ -389,9 +389,10 @@ function sgs_emails_choose_image($email_address,$user,$contents_all,$exclude_ids
 	$pt = $settings['sgs_emails_settings_ptype'];
 
 	$image_id = '';
+
 	while ( $image_id == '' ) {
 		$content_id = sgs_emails_current_get($email_address,'next');
-		if ( $content_id == '' ) {
+		if ( $content_id == '' )
 			$args = array(
 				'post_type' => $pt,
 				'showposts' => 1,
@@ -400,17 +401,15 @@ function sgs_emails_choose_image($email_address,$user,$contents_all,$exclude_ids
 				'post_status' => 'publish',
 				'post__not_in' => $exclude_ids
 			);
-		}
-		else {
+		else
 			$args = array(
 				'post_type' => $pt,
 				'p' => $content_id,
 				'post_status' => 'publish'
 			);
-		}
 		$contents = get_posts($args);
-
 		$content = $contents[0];
+
 		if ( has_post_thumbnail($content->ID) ) {
 			$image['id'] = get_post_thumbnail_id($content->ID);
 			$image['alt'] = __('Image','sgs-emails');
@@ -469,52 +468,47 @@ function sgs_emails_choose_image($email_address,$user,$contents_all,$exclude_ids
 
 	add_user_meta( $user->ID, '_sgs_emails_log', $content->ID );
 
-	// check how many images has already received the user
-	$contents_check = $contents_all;
-	$u_log_check = get_user_meta($user->ID,'_sgs_emails_log');
-	if ( !empty($contents_check) && count($contents_check) == count($u_log_check) )
-		add_user_meta( $user->ID, '_sgs_emails_ended', 1, true );
-
 	return $image;
 }
 
 // COMPOSE AND SEND EMAIL
-function sgs_emails_compose_and_send($email_address,$user,$contents_all,$exclude_ids) {
+function sgs_emails_compose_and_send($selected) {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$from = $settings['sgs_emails_settings_from'];
 	$from_name = $settings['sgs_emails_settings_from_name'];
 	$replyto = $settings['sgs_emails_settings_replyto'];
 	$replyto_name = $settings['sgs_emails_settings_replyto_name'];
 
-	$to = $email_address;
-	$subject = sgs_emails_choose_subject();
 
-	$image = sgs_emails_choose_image($to,$user,$contents_all,$exclude_ids);
-	if ( $image == false )
-		return;
+	foreach ( $selected as $u ) {
+		$to = $u['user']->user_email;
+		$subject = sgs_emails_choose_subject();
+		$image = sgs_emails_choose_image($to,$u['user'],$u['contents'],$u['exclude']);
+		if ( $image == false )
+			continue;
+		$related_file = $image['path'];
+		$related_cid = sgs_emails_random_string(); //will map it to this UID
+		$related_name = $image['filename']; //this will be the file name for the attachment
+		include "email-template.php";
+		$body = $email_template;
+	
+		$sgs_emails_phpmailer = function(&$phpmailer)use($related_file,$related_cid,$related_name,$from,$from_name,$replyto,$replyto_name){
 
-	$related_file = $image['path'];
-	$related_cid = sgs_emails_random_string(); //will map it to this UID
-	$related_name = $image['filename']; //this will be the file name for the attachment
+			// $phpmailer->SMTPKeepAlive = true;
+			$phpmailer->IsHTML(true);
+			$phpmailer->From = $from;
+			$phpmailer->FromName = $from_name;
+			$phpmailer->AddReplyTo($replyto, $replyto_name);
+			$phpmailer->AddEmbeddedImage($related_file, $related_cid, $related_name);
 
-	include "email-template.php";
-	$body = $email_template;
+		};
 
-	$sgs_emails_phpmailer = function(&$phpmailer)use($related_file,$related_cid,$related_name,$from,$from_name,$replyto,$replyto_name){
+		add_action( 'phpmailer_init',$sgs_emails_phpmailer);
+		$sent = wp_mail( $to, $subject, $body);
+		remove_action('phpmailer_init', $sgs_emails_phpmailer);
+	}
 
-	$phpmailer->SMTPKeepAlive = true;
-	$phpmailer->IsHTML(true);
-	$phpmailer->AddEmbeddedImage($related_file, $related_cid, $related_name);
-	$phpmailer->From = $from;
-	$phpmailer->FromName = $from_name;
-	$phpmailer->AddReplyTo($replyto, $replyto_name);
-	};
-
-	add_action( 'phpmailer_init',$sgs_emails_phpmailer);
-	$sent = wp_mail( $to, $subject, $body);
-	remove_action('phpmailer_init', $sgs_emails_phpmailer);
-
-	return $sent;
+	return;
 }
 
 // DETERMINE WHEN TO SEND EMAIL
@@ -572,34 +566,47 @@ function sgs_emails_action_per_address() {
 	$settings = (array) get_option( 'sgs_emails_settings' );
 	$pt = $settings['sgs_emails_settings_ptype'];
 	$addresses = $settings['sgs_emails_settings_addresses'];
+
 	$args = array(
 		'post_type' => $pt,
 		'showposts' => -1,
 		'post_status' => 'publish'
 	);
 	$contents = get_posts($args);
+	$selected = array();
+	$exclude_ids = array();
 	foreach ( $addresses as $a ) {
+
 		// get current user by email
 		$u = get_user_by('email',$a);
 		if ( $u == false ) // if user does not exist
 			continue;
 
-		$u_ended = get_user_meta($u->ID,'_sgs_emails_ended');
-		if ( $u_ended[0] == 1 )
+		$u_ended = get_user_meta($u->ID,'_sgs_emails_ended',true);
+		if ( $u_ended == 1 )
 			continue;
 
 		$u_log = get_user_meta($u->ID,'_sgs_emails_log');
-		if ( ! empty($u_log) ) {
-			foreach ( $u_log as $l ) {
-				$exclude_ids[] = $l['ID'];
-			}
+		if ( ! empty($u_log) )
+			$exclude_ids = wp_list_pluck( $u_log, 'ID' );
+
+		if ( count($exclude_ids) >= count($contents) ) {
+			add_user_meta( $u->ID, '_sgs_emails_ended', 1, true );
+			continue;
 		}
-		else { $exclude_ids = array(); }
 
 		if ( sgs_emails_if_send($a,$contents,$u_log) !== 1 )
 			continue;
-		$sent = sgs_emails_compose_and_send($a,$u,$contents,$exclude_ids);
+
+		$selected[] = array(
+			'user' => $u,
+			'contents' => $contents,
+			'exclude' => $exclude_ids
+		);
 	}
+
+	sgs_emails_compose_and_send($selected);
+
 	return;
 }
 
@@ -639,18 +646,12 @@ function sgs_emails_current_get($address,$format) {
 
 	$log = $series[$address];
 
-	if ( $format == 'next' ) {
-		if ( $log['next'] == '' )
-			$requested_log = '';
-
+	$requested_log = '';
+	if ( $format == 'next' && $log['next'] != '' && is_array($log['current']) && array_key_exists('current',$log) && array_key_exists($log['next'],$log['current']) )
 		$requested_log = $log['current'][$log['next']];
-	}
-	elseif ( $format == 'current') {
-		if ( $log['current'] == '' )
-			$requested_log = '';
-
+	elseif ( $format == 'current' && array_key_exists('current',$log) && $log['current'] != '' )
 		$requested_log = $log['current'];
-	}
+
 	return $requested_log;
 }
 
